@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOL GEMS · 迷幻摇滚音乐节海报</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+        background: #1a0f08;
+        min-height: 100vh;
+        color: #fff;
+        overflow-x: hidden;
+    }
+    .bg-pattern {
+        position: fixed; inset: 0;
+        background: 
+            radial-gradient(circle at 50% 50%, rgba(220,80,30,0.35), transparent 60%),
+            repeating-radial-gradient(circle at 50% 50%, transparent, transparent 40px, rgba(255,180,80,0.05) 40px, rgba(255,180,80,0.05) 42px);
+        z-index: 0; pointer-events: none;
+    }
+    .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 60px 40px 80px; }
+
+    .back-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 20px; border-radius: 999px;
+        background: rgba(255,255,255,0.08); border: 1px solid rgba(255,200,120,0.3);
+        color: #ffd6a5; font-size: 14px; text-decoration: none;
+        transition: all 0.3s ease; margin-bottom: 40px;
+    }
+    .back-btn:hover { background: rgba(255,180,80,0.2); border-color: rgba(255,200,120,0.6); }
+
+    header { text-align: center; margin-bottom: 50px; animation: fadeDown 0.8s ease both; }
+    header .tag {
+        display: inline-block; padding: 6px 20px; border: 1px solid rgba(255,200,120,0.35);
+        border-radius: 999px; font-size: 13px; letter-spacing: 4px; color: #ffc98a;
+        margin-bottom: 22px; backdrop-filter: blur(6px); background: rgba(255,200,120,0.06);
+    }
+    header h1 {
+        font-size: 48px; font-weight: 800; letter-spacing: 3px;
+        background: linear-gradient(90deg, #ffc98a, #ff8c42 50%, #c9302c);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        margin-bottom: 16px;
+    }
+    header p.subtitle { font-size: 17px; color: rgba(255,220,180,0.7); letter-spacing: 1px; }
+
+    .poster-wrap {
+        display: flex; justify-content: center; align-items: flex-start;
+        gap: 50px; flex-wrap: wrap; margin-bottom: 50px;
+        animation: fadeUp 0.8s 0.2s ease both;
+    }
+    .poster-frame {
+        flex: 0 0 auto;
+        background: #2a1810;
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,180,80,0.25);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 80px rgba(220,80,30,0.2);
+    }
+    .poster-frame img {
+        display: block; max-width: 100%; width: 420px;
+        border-radius: 6px;
+    }
+    .poster-info {
+        flex: 1; min-width: 300px; max-width: 480px;
+    }
+    .poster-info h2 {
+        font-size: 26px; margin-bottom: 18px;
+        color: #ffd6a5; letter-spacing: 2px;
+    }
+    .info-block { margin-bottom: 22px; }
+    .info-block .label {
+        font-size: 12px; letter-spacing: 2px; color: #ff8c42;
+        margin-bottom: 8px; text-transform: uppercase;
+    }
+    .info-block .content {
+        font-size: 15px; line-height: 1.9; color: rgba(255,230,200,0.88);
+    }
+
+    .tag-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .tag-item {
+        font-size: 12px; padding: 5px 14px; border-radius: 999px;
+        background: rgba(255,140,66,0.15); border: 1px solid rgba(255,140,66,0.4);
+        color: #ffc98a;
+    }
+
+    .section {
+        animation: fadeUp 0.8s 0.4s ease both;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,180,80,0.15);
+        border-radius: 20px; padding: 35px; margin-bottom: 25px;
+    }
+    .section h3 {
+        font-size: 20px; margin-bottom: 18px; color: #ffd6a5;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .section h3::before {
+        content: ""; width: 4px; height: 22px; border-radius: 2px;
+        background: linear-gradient(180deg, #ff8c42, #c9302c);
+    }
+    .section p, .section li {
+        font-size: 15px; line-height: 2; color: rgba(255,230,200,0.82);
+    }
+    .section ul { padding-left: 22px; }
+    .section li { margin-bottom: 6px; }
+
+    .color-palette { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 14px; }
+    .swatch {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .swatch .color-box {
+        width: 56px; height: 56px; border-radius: 12px;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15), 0 6px 16px rgba(0,0,0,0.4);
+    }
+    .swatch .hex { font-size: 11px; color: rgba(255,230,200,0.6); font-family: monospace; }
+
+    .download-btn {
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 14px 28px; border-radius: 12px;
+        background: linear-gradient(90deg, #c9302c, #ff8c42);
+        color: #fff; font-size: 15px; font-weight: 600;
+        text-decoration: none; letter-spacing: 1px;
+        transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(201,48,44,0.35);
+    }
+    .download-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,48,44,0.5); }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 700px) {
+        header h1 { font-size: 32px; }
+        .poster-frame img { width: 100%; }
+        .section { padding: 24px; }
+        .container { padding: 40px 20px 60px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="container">
+
+    <a class="back-btn" href="./index.html">← 返回作品集</a>
+
+    <header>
+        <div class="tag">作品 06 · 平面设计</div>
+        <h1>SOL GEMS</h1>
+        <p class="subtitle">1960 年代迷幻摇滚音乐节海报 · AI 辅助创作</p>
+    </header>
+
+    <div class="poster-wrap">
+        <div class="poster-frame">
+            <img src="./images/sol-gems-poster.jpg" alt="SOL GEMS 迷幻摇滚音乐节海报">
+        </div>
+        <div class="poster-info">
+            <div class="info-block">
+                <div class="label">作品名称</div>
+                <div class="content">SOL GEMS · 迷幻摇滚音乐节海报</div>
+            </div>
+            <div class="info-block">
+                <div class="label">创作风格</div>
+                <div class="content">1960 年代嬉皮士 · 新艺术运动装饰 · 平面设计</div>
+            </div>
+            <div class="info-block">
+                <div class="label">来自</div>
+                <div class="content">一次完整的 <strong>AI 图像生成</strong> 与 <strong>风格化排版</strong> 实践</div>
+            </div>
+            <div class="info-block">
+                <div class="label">关键元素</div>
+                <div class="tag-list">
+                    <span class="tag-item">全知之眼</span>
+                    <span class="tag-item">旋涡花卉</span>
+                    <span class="tag-item">同心圆涟漪</span>
+                    <span class="tag-item">复古衬线字</span>
+                    <span class="tag-item">暖色调</span>
+                    <span class="tag-item">神秘超现实</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>画面描述</h3>
+        <p>
+            竖版构图，画面中央一只巨大的 <strong>全知之眼</strong>，深红色瞳孔，外围绽放金色光芒。眼睛下方是粗体圆润的复古衬线字标题
+            <strong>"SOL GEMS"</strong>。左右两侧对称分布着 <strong>旋涡状花卉图案</strong>，周围点缀细小星光。
+            背景是从中心向外扩散的 <strong>同心圆涟漪纹理</strong>，橙红色与米白色交替条纹，营造迷幻的视觉律动。
+        </p>
+    </div>
+
+    <div class="section">
+        <h3>配色方案</h3>
+        <p>整体暖色调，灵感来自 60 年代嬉皮士运动的精神氛围：</p>
+        <div class="color-palette">
+            <div class="swatch"><div class="color-box" style="background:#C9302C"></div><span class="hex">#C9302C</span></div>
+            <div class="swatch"><div class="color-box" style="background:#E87833"></div><span class="hex">#E87833</span></div>
+            <div class="swatch"><div class="color-box" style="background:#F5A623"></div><span class="hex">#F5A623</span></div>
+            <div class="swatch"><div class="color-box" style="background:#FFD700"></div><span class="hex">#FFD700</span></div>
+            <div class="swatch"><div class="color-box" style="background:#FFF5E1"></div><span class="hex">#FFF5E1</span></div>
+            <div class="swatch"><div class="color-box" style="background:#4A1510"></div><span class="hex">#4A1510</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>风格参考</h3>
+        <ul>
+            <li><strong>1960s Psychedelic Rock</strong> — 迷幻摇滚音乐节海报的黄金年代</li>
+            <li><strong>Art Nouveau</strong> — 新艺术运动的装饰性曲线与有机形态</li>
+            <li><strong>Hippie Aesthetic</strong> — 嬉皮士运动的神秘主义与反文化表达</li>
+            <li><strong>Flat Design with Bold Outlines</strong> — 平面设计风格，粗轮廓线高对比度</li>
+        </ul>
+    </div>
+
+    <div class="section" style="text-align:center;">
+        <a class="download-btn" href="./images/sol-gems-poster.jpg" download>⬇ 下载高清海报</a>
+    </div>
+
+</div>
+
+</body>
+</html>
