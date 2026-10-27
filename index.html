@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人工智能课程学习成果展示</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        min-height: 100vh;
+        color: #fff;
+        overflow-x: hidden;
+    }
+    .bg-glow { position: fixed; border-radius: 50%; filter: blur(120px); opacity: 0.35; z-index: 0; pointer-events: none; }
+    .glow-1 { width: 500px; height: 500px; background: #4facfe; top: -150px; left: -150px; }
+    .glow-2 { width: 400px; height: 400px; background: #a18cd1; bottom: -100px; right: -100px; }
+    .glow-3 { width: 300px; height: 300px; background: #43e97b; top: 50%; left: 60%; }
+    .container { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 70px 40px 60px; }
+
+    header { text-align: center; margin-bottom: 70px; animation: fadeDown 1s ease both; }
+    header .tag {
+        display: inline-block; padding: 6px 20px; border: 1px solid rgba(255,255,255,0.35);
+        border-radius: 999px; font-size: 13px; letter-spacing: 4px; color: #9ed0ff;
+        margin-bottom: 22px; backdrop-filter: blur(6px); background: rgba(255,255,255,0.06);
+    }
+    header h1 {
+        font-size: 52px; font-weight: 800;
+        background: linear-gradient(90deg, #ffffff, #8ec5fc 60%, #e0c3fc);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        margin-bottom: 16px; letter-spacing: 2px;
+    }
+    header p.subtitle { font-size: 18px; color: rgba(255,255,255,0.72); letter-spacing: 1px; }
+    header p.subtitle span { color: #ffd6a5; }
+    header .author {
+        margin-top: 22px; display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 22px; border-radius: 999px;
+        background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+        font-size: 14.5px; color: rgba(255,255,255,0.85); letter-spacing: 1px;
+    }
+
+    .timeline { display: flex; justify-content: center; align-items: center; gap: 0; margin-bottom: 60px; animation: fadeDown 1s 0.2s ease both; flex-wrap: wrap; }
+    .timeline .node { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 110px; }
+    .timeline .dot {
+        width: 16px; height: 16px; border-radius: 50%;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        box-shadow: 0 0 16px rgba(79,172,254,0.8); position: relative;
+    }
+    .timeline .dot::after {
+        content: ""; position: absolute; inset: -6px; border-radius: 50%;
+        border: 1px solid rgba(79,172,254,0.4); animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.6); opacity: 0; } }
+    .timeline .node span { font-size: 13px; color: rgba(255,255,255,0.75); }
+    .timeline .line { flex: 0 0 60px; height: 2px; background: linear-gradient(90deg, rgba(79,172,254,0.8), rgba(79,172,254,0.25)); margin-bottom: 24px; }
+
+    .works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 32px; animation: fadeUp 1s 0.35s ease both; }
+    .card {
+        background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 20px; overflow: hidden; backdrop-filter: blur(14px);
+        transition: transform 0.45s cubic-bezier(.2,.8,.2,1), box-shadow 0.45s ease, border-color 0.45s ease;
+        display: flex; flex-direction: column; text-decoration: none; color: inherit; position: relative;
+    }
+    .card:hover { transform: translateY(-12px) scale(1.02); box-shadow: 0 24px 48px rgba(0,0,0,0.45); border-color: rgba(142,197,252,0.55); }
+    .card-img { position: relative; height: 200px; overflow: hidden; }
+    .card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; display: block; }
+    .card:hover .card-img img { transform: scale(1.1); }
+    .card-img .badge {
+        position: absolute; top: 14px; left: 14px; padding: 5px 14px; border-radius: 999px;
+        font-size: 12px; font-weight: 600; letter-spacing: 1px; color: #fff;
+        backdrop-filter: blur(8px); background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.25);
+    }
+    .card-body { padding: 24px 24px 28px; flex: 1; display: flex; flex-direction: column; }
+    .card-body h3 { font-size: 21px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; color: #fff; }
+    .card-body h3 .icon { font-size: 22px; }
+    .card-body .en { font-size: 12px; color: rgba(255,255,255,0.45); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+    .card-body p.desc { font-size: 14.5px; line-height: 1.8; color: rgba(255,255,255,0.8); flex: 1; }
+    .card-body p.desc strong { color: #a8d8ff; font-weight: 600; }
+    .card-foot { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip { font-size: 12px; padding: 4px 12px; border-radius: 999px; background: rgba(79,172,254,0.15); border: 1px solid rgba(79,172,254,0.35); color: #9ed0ff; }
+    .open-btn {
+        margin-top: 20px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 11px 20px; border-radius: 12px;
+        background: linear-gradient(90deg, rgba(79,172,254,0.25), rgba(0,242,254,0.15));
+        border: 1px solid rgba(79,172,254,0.5); color: #cfeaff; font-size: 14px; font-weight: 600;
+        letter-spacing: 1px; transition: all 0.3s ease;
+    }
+    .card:hover .open-btn { background: linear-gradient(90deg, #4facfe, #00f2fe); color: #06222e; box-shadow: 0 6px 20px rgba(79,172,254,0.45); }
+    .open-btn .arrow { transition: transform 0.3s ease; }
+    .card:hover .open-btn .arrow { transform: translateX(5px); }
+
+    .card::before { content: ""; height: 4px; display: block; background: var(--accent, linear-gradient(90deg,#4facfe,#00f2fe)); }
+    .card:nth-child(1) { --accent: linear-gradient(90deg,#a18cd1,#fbc2eb); }
+    .card:nth-child(2) { --accent: linear-gradient(90deg,#4facfe,#00f2fe); }
+    .card:nth-child(3) { --accent: linear-gradient(90deg,#43e97b,#38f9d7); }
+    .card:nth-child(4) { --accent: linear-gradient(90deg,#fa709a,#fee140); }
+    .card:nth-child(5) { --accent: linear-gradient(90deg,#ffd700,#ff6b6b); }
+    .card:nth-child(6) { --accent: linear-gradient(90deg,#c9302c,#ff8c42); }
+
+    .summary {
+        margin-top: 70px; text-align: center;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 20px; padding: 40px 30px; backdrop-filter: blur(10px);
+        animation: fadeUp 1s 0.5s ease both;
+    }
+    .summary h2 { font-size: 26px; margin-bottom: 16px; background: linear-gradient(90deg,#ffd6a5,#fdffb6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .summary p { color: rgba(255,255,255,0.75); font-size: 15.5px; line-height: 2; max-width: 800px; margin: 0 auto; }
+    .summary .stats { margin-top: 28px; display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; }
+    .stat .num { font-size: 34px; font-weight: 800; background: linear-gradient(90deg,#4facfe,#00f2fe); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat .label { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; letter-spacing: 1px; }
+
+    footer { text-align: center; margin-top: 50px; font-size: 13px; color: rgba(255,255,255,0.4); letter-spacing: 1px; line-height: 2; }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 640px) {
+        header h1 { font-size: 32px; }
+        .timeline .line { flex: 0 0 20px; }
+        .timeline .node { min-width: 70px; }
+        .timeline .node span { font-size: 11px; }
+        .container { padding: 50px 20px 40px; }
+        .summary .stats { gap: 28px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="bg-glow glow-1"></div>
+<div class="bg-glow glow-2"></div>
+<div class="bg-glow glow-3"></div>
+
+<div class="container">
+
+    <header>
+        <div class="tag">AI COURSE PORTFOLIO</div>
+        <h1>人工智能课程学习成果</h1>
+        <p class="subtitle">六次实践 · 六个可体验作品 —— 记录我在 <span>AI 工具、机器学习与创意设计</span> 学习中的每一步成长</p>
+        <div class="author">🎓 人工智能课程 · 作品集</div>
+    </header>
+
+    <!-- 学习进度时间线 -->
+    <div class="timeline">
+        <div class="node"><div class="dot"></div><span>第一次课</span></div>
+        <div class="line"></div>
+        <div class="node"><div class="dot"></div><span>第二次课</span></div>
+        <div class="line"></div>
+        <div class="node"><div class="dot"></div><span>第三次课 · 上</span></div>
+        <div class="line"></div>
+        <div class="node"><div class="dot"></div><span>第三次课 · 下</span></div>
+        <div class="line"></div>
+        <div class="node"><div class="dot"></div><span>旋律创作</span></div>
+        <div class="line"></div>
+        <div class="node"><div class="dot"></div><span>平面海报</span></div>
+    </div>
+
+    <!-- 作品卡片 -->
+    <div class="works-grid">
+
+        <!-- 作品一 -->
+        <a class="card" href="https://adorable-scone-a5333f.netlify.app/works/01-mcp-skill-concept" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=clean%20modern%20mind%20map%20concept%20diagram%20about%20AI%20tools%20collaboration%2C%20MCP%20protocol%20and%20skills%20nodes%20connected%20with%20glowing%20lines%2C%20purple%20pink%20gradient%20background%2C%20minimalist%20tech%20infographic%20style&image_size=landscape_4_3" alt="MCP 与 Skill 概念图">
+                <div class="badge">作品 01 · 可交互</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">🔗</span>MCP 与 Skill 概念图</h3>
+                <div class="en">Concept Map · Lesson 1</div>
+                <p class="desc">来自<strong>第一次课</strong>。用可视化概念图讲解 <strong>MCP（模型上下文协议）</strong>和 <strong>Skill（可复用能力包）</strong>的定义、工作原理及协作关系，展示我对 AI 工具协作机制的理解。</p>
+                <div class="card-foot">
+                    <span class="chip">概念图</span>
+                    <span class="chip">MCP</span>
+                    <span class="chip">Skill</span>
+                    <span class="chip">协议对比</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+        <!-- 作品二 -->
+        <a class="card" href="https://adorable-scone-a5333f.netlify.app/works/02-snake-game" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=retro%20snake%20arcade%20game%20on%20glowing%20neon%20grid%2C%20green%20snake%20chasing%20red%20apple%2C%20dark%20blue%20cyberpunk%20background%2C%20pixel%20art%20style%20game%20screen%2C%20vibrant%20glow%20effect&image_size=landscape_4_3" alt="贪吃蛇游戏">
+                <div class="badge">作品 02 · 可试玩</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">🐍</span>贪吃蛇游戏</h3>
+                <div class="en">Snake Game · Lesson 2</div>
+                <p class="desc">来自<strong>第二次课</strong>。我创作的贪吃蛇小游戏，包含<strong>速度递增、历史最高分记录、Top10 排行榜和成绩导出</strong>功能，是一次完整的前端游戏开发实践。</p>
+                <div class="card-foot">
+                    <span class="chip">HTML5 Canvas</span>
+                    <span class="chip">游戏开发</span>
+                    <span class="chip">localStorage</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+        <!-- 作品三 -->
+        <a class="card" href="https://adorable-scone-a5333f.netlify.app/works/03-cnn-weather" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=convolutional%20neural%20network%20for%20weather%20classification%2C%20sunny%20rainy%20cloudy%20icons%20flowing%20through%20network%20layers%2C%20pixelated%20weather%20images%2C%20green%20teal%20glowing%20tech%20style%2C%20scientific%20illustration&image_size=landscape_4_3" alt="CNN 天气识别实验">
+                <div class="badge">作品 03 · 可交互</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">☁️</span>CNN 天气识别实验</h3>
+                <div class="en">CNN Weather · Lesson 3A</div>
+                <p class="desc">来自<strong>第三次课（上）</strong>。用 <strong>CNN 识别晴天 / 雨天 / 多云</strong>三种天气，交互式演示<strong>卷积 → ReLU → 池化 → Softmax</strong> 全流程，含像素化天气图和概率输出，一次完整的分类任务实践。</p>
+                <div class="card-foot">
+                    <span class="chip">CNN</span>
+                    <span class="chip">卷积神经网络</span>
+                    <span class="chip">天气分类</span>
+                    <span class="chip">Softmax</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+        <!-- 作品四 -->
+        <a class="card" href="https://adorable-scone-a5333f.netlify.app/works/02-ai-pe-training" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=precision%20and%20recall%20evaluation%20metrics%20data%20visualization%2C%20confusion%20matrix%20charts%20and%20PR%20curve%20for%20sports%20fitness%20test%2C%20orange%20pink%20warm%20gradient%20analytics%20dashboard%20style%2C%20clean%20modern%20data%20science%20infographic&image_size=landscape_4_3" alt="精确率召回率练习">
+                <div class="badge">作品 04 · 可交互</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">📊</span>精确率召回率练习</h3>
+                <div class="en">Precision & Recall · Lesson 3B</div>
+                <p class="desc">来自<strong>第三次课（下）</strong>。体育体能测试场景下的<strong>混淆矩阵练习</strong>（TP=9 / FP=3 / FN=6 / TN=12），含交互式 <strong>P / R / F1 计算器</strong>和自洽验证，是我的评估指标计算成果。</p>
+                <div class="card-foot">
+                    <span class="chip">混淆矩阵</span>
+                    <span class="chip">Precision</span>
+                    <span class="chip">Recall</span>
+                    <span class="chip">F1</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+        <!-- 作品五：上官吕轩旋律试听 -->
+        <a class="card" href="./shangguan_lvxuan_demo.html" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20chinese%20wuxia%20sword%20hero%20legend%2C%20musical%20melody%20notes%20flowing%20like%20calligraphy%2C%20guqin%20zither%20and%20flute%2C%20golden%20silk%20red%20lantern%20oriental%20night%20atmosphere%2C%20cinematic%20wuxia%20soundtrack%20album%20cover%20art%2C%20epic%20traditional%20chinese%20music&image_size=landscape_4_3" alt="上官吕轩 · 旋律试听">
+                <div class="badge">作品 05 · 可试听</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">🎵</span>上官吕轩 · 旋律试听</h3>
+                <div class="en">Wuxia Melody · Original Composition</div>
+                <p class="desc">一首<strong>原创武侠风旋律</strong>，G 调 BPM96。用 <strong>Web Audio API</strong> 在浏览器中实时合成古琴与箫的音色，包含主歌、预副歌、副歌、桥段完整结构，支持分段试听。</p>
+                <div class="card-foot">
+                    <span class="chip">Web Audio API</span>
+                    <span class="chip">旋律创作</span>
+                    <span class="chip">武侠风</span>
+                    <span class="chip">G调</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+        <!-- 作品六：SOL GEMS 迷幻摇滚音乐节海报 -->
+        <a class="card" href="./06-sol-gems-poster.html" target="_blank" rel="noopener">
+            <div class="card-img">
+                <img src="./images/sol-gems-poster.jpg" alt="SOL GEMS 迷幻摇滚音乐节海报">
+                <div class="badge">作品 06 · 平面设计</div>
+            </div>
+            <div class="card-body">
+                <h3><span class="icon">👁️</span>SOL GEMS 音乐节海报</h3>
+                <div class="en">Psychedelic Poster · Flat Design</div>
+                <p class="desc">一次<strong>AI 辅助平面设计</strong>实践。1960 年代嬉皮士风格的迷幻摇滚音乐节海报，中央<strong>全知之眼</strong>配旋涡花卉与同心圆涟漪，暖色调：赭石橙红、金黄、深红、米白。</p>
+                <div class="card-foot">
+                    <span class="chip">AI 图像生成</span>
+                    <span class="chip">平面设计</span>
+                    <span class="chip">1960s 风格</span>
+                    <span class="chip">复古排版</span>
+                </div>
+                <span class="open-btn">打开作品 <span class="arrow">→</span></span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- 总结 -->
+    <div class="summary">
+        <h2>学习收获与总结</h2>
+        <p>
+            从绘制 <strong>MCP 与 Skill 概念图</strong>理解 AI 工具协作机制，到独立开发带排行榜的<strong>贪吃蛇游戏</strong>；
+            从搭建 <strong>CNN 天气分类模型</strong>并可视化推理全流程，到用<strong>混淆矩阵</strong>亲手计算精确率、召回率与 F1；
+            用 <strong>Web Audio API</strong> 从零合成武侠风旋律，再到用 AI 创作出 <strong>60 年代迷幻摇滚音乐节海报</strong>——
+            这六个作品记录了我从"理解概念"到"动手实践"再到"创意输出"的完整成长轨迹。
+        </p>
+        <div class="stats">
+            <div class="stat"><div class="num">6</div><div class="label">课程作品</div></div>
+            <div class="stat"><div class="num">4</div><div class="label">交互式实验</div></div>
+            <div class="stat"><div class="num">1</div><div class="label">可试玩游戏</div></div>
+            <div class="stat"><div class="num">1</div><div class="label">原创音乐</div></div>
+            <div class="stat"><div class="num">1</div><div class="label">平面设计</div></div>
+        </div>
+    </div>
+
+    <footer>
+        人工智能课程学习成果展示<br>
+        点击任意作品卡片即可查看完整内容 · 2026-10-26
+    </footer>
+
+</div>
+
+</body>
+</html>
