@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>上官吕轩 · 旋律试听</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+    padding: 30px 20px;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.2em;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #ffd700, #ff6b6b, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #888;
+    margin-bottom: 30px;
+    font-size: 0.95em;
+  }
+  .card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .section-title {
+    font-size: 1.2em;
+    color: #ffd700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,215,0,0.3);
+  }
+  .lyrics {
+    font-size: 1.05em;
+    line-height: 2;
+    color: #ccc;
+    white-space: pre-wrap;
+    font-family: "STKaiti", "KaiTi", serif;
+  }
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 12px 28px;
+    font-size: 1em;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .btn-main {
+    background: linear-gradient(135deg, #ffd700, #ff6b6b);
+    color: #1a1a2e;
+  }
+  .btn-main:hover { transform: scale(1.05); box-shadow: 0 5px 25px rgba(255,215,0,0.4); }
+  .btn-ghost {
+    background: transparent;
+    color: #ffd700;
+    border: 2px solid #ffd700;
+  }
+  .btn-ghost:hover { background: rgba(255,215,0,0.1); }
+  .progress-wrap {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 8px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .progress {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ff6b6b);
+    width: 0%;
+    transition: width 0.1s linear;
+    border-radius: 10px;
+  }
+  .current-note {
+    text-align: center;
+    font-size: 1.4em;
+    color: #ffd700;
+    min-height: 40px;
+    margin: 10px 0;
+    text-shadow: 0 0 20px rgba(255,215,0,0.5);
+  }
+  .info {
+    font-size: 0.85em;
+    color: #999;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+  }
+  .legend-item {
+    background: rgba(255,255,255,0.03);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>上官吕轩</h1>
+  <div class="subtitle">🗡️ 江湖武侠风 · 旋律试听版 · G调 BPM96</div>
+
+  <div class="controls">
+    <button class="btn-main" onclick="playAll()">▶ 播放全曲</button>
+    <button class="btn-ghost" onclick="stopAll()">■ 停止</button>
+    <button class="btn-ghost" onclick="playSection('verse1')">主歌一</button>
+    <button class="btn-ghost" onclick="playSection('pre')">预副歌</button>
+    <button class="btn-ghost" onclick="playSection('chorus')">副歌</button>
+    <button class="btn-ghost" onclick="playSection('bridge')">桥段</button>
+  </div>
+
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+  <div class="current-note" id="currentNote">🎵 点击上方按钮开始播放</div>
+
+  <div class="card">
+    <div class="section-title">🎼 简谱旋律</div>
+    <div class="lyrics">【前奏】(古琴+鼓点)
+
+【Verse 1 - 主歌一】
+3 5 6 5 | 3 5 2 1 | 6 1 2 3 | 2 - - -
+剑指苍穹问九天 上官门下出英贤
+
+3 5 6 5 | 3 2 2 1 | 6 5 6 1 | 1 - - -
+三代单传吕家骨 轩昂气宇镇河山
+
+3 3 5 5 | 6 6 5 3 | 2 2 1 6 | 6 - - -
+十岁能挽三石弓 十五剑挑九华山
+
+3 5 6 1 | 6 5 3 2 | 1 6 5 3 | 1 - - -
+一双星眸寒似月 一身傲骨韧如磐
+
+【Pre-Chorus - 预副歌】
+5 3 5 6 | 5 - 3 - | 6 5 6 1 | 1 - 6 -
+江湖令 传四方 谁与争锋论短长
+
+5 3 5 6 | 5 - 3 - | 1 - - - | 1 - - -
+吕轩阁 藏秘典 一剑光寒十九州！
+
+【Chorus - 副歌】
+3 3 5 5 | 6 6 1 1 | 6 6 5 3 | 2 2 1 6
+哈！上官吕轩！ 刀光剑影何所惧
+
+3 3 5 5 | 6 6 1 1 | 2 2 3 2 | 1 - - -
+一杯浊酒酬知己 万千敌寇等闲看
+
+3 3 5 5 | 6 6 1 1 | 6 6 5 3 | 2 2 1 6
+哈！上官吕轩！ 白衣胜雪踏风来
+
+3 3 5 5 | 6 5 3 2 | 1 - 6 - | 1 - - -
+剑鞘一抹朱砂印 江湖从此留传说
+
+【Bridge - 桥段】(箫 solo)
+6 1 2 3 | 2 1 6 5 | 3 5 6 1 | 6 - - -
+高处寒 孤影单 谁懂侠客心底酸
+
+3 5 6 1 | 6 5 3 2 | 1 - 6 - | 1 - - -
+名成身退江湖隐 只余残剑伴青山</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🎹 和弦走向</div>
+    <div class="legend">
+      <div class="legend-item"><b>Verse：</b>G → D → Em → C (循环)</div>
+      <div class="legend-item"><b>Pre：</b>Bm → Em → C → D (上行推进)</div>
+      <div class="legend-item"><b>Chorus：</b>G → D → Em → C → G → D → C → D</div>
+      <div class="legend-item"><b>Bridge：</b>Am → Bm → C → D (渐弱)</div>
+    </div>
+    <div class="info">💡 G调指法简单，吉他capo 2品用F调指法可唱</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🎼 数字谱对照表 (G调)</div>
+    <div class="legend">
+      <div class="legend-item">1 = G4 (392Hz)</div>
+      <div class="legend-item">2 = A4 (440Hz)</div>
+      <div class="legend-item">3 = B4 (494Hz)</div>
+      <div class="legend-item">4 = C5 (523Hz)</div>
+      <div class="legend-item">5 = D5 (587Hz)</div>
+      <div class="legend-item">6 = E5 (659Hz)</div>
+      <div class="legend-item">7 = F#5 (740Hz)</div>
+      <div class="legend-item">1̇ = G5 (784Hz)</div>
+    </div>
+  </div>
+
+  <div class="info">
+    🔊 本演示使用 Web Audio API 合成，音色为模拟古琴/箫的正弦波叠加<br>
+    💻 建议使用 Chrome / Edge 浏览器打开以获得最佳体验
+  </div>
+</div>
+
+<script>
+// ===== Web Audio Setup =====
+let audioCtx = null;
+let masterGain = null;
+let isPlaying = false;
+let stopFlag = false;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.3;
+    masterGain.connect(audioCtx.destination);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+// G调频率映射 (G4 = 1)
+const NOTE_FREQ = {
+  '1': 392.00, '2': 440.00, '3': 493.88, '4': 523.25,
+  '5': 587.33, '6': 659.25, '7': 739.99,
+  '1h': 783.99, '2h': 880.00, '3h': 987.77, '4h': 1046.50,
+  '5h': 1174.66, '6h': 1318.51, '7h': 1479.98
+};
+
+// BPM 96 -> beat duration in seconds
+const BEAT = 60 / 96;
+
+// ===== Note Player =====
+function playNote(freq, startTime, duration, type='sine', volume=0.4) {
+  if (stopFlag) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  // Simulate guqin/xiang sound with harmonics
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, startTime);
+  
+  // ADSR envelope
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(volume, startTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(volume * 0.7, startTime + duration * 0.3);
+  gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+  
+  osc.connect(gain);
+  gain.connect(masterGain);
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.05);
+}
+
+function playChord(freqs, startTime, duration) {
+  freqs.forEach(f => playNote(f, startTime, duration, 'triangle', 0.15));
+}
+
+// ===== Parse note pattern like "3 5 6 5" =====
+// Each token: note number (1-7) possibly with 'h' for high octave
+// Notes separated by spaces, | marks bar lines
+function parseNotes(pattern) {
+  const tokens = pattern.replace(/\|/g, '').trim().split(/\s+/);
+  return tokens.map(t => {
+    const isHigh = t.includes('h') || t.includes('.');
+    const noteNum = parseInt(t.replace(/[h.]/g, ''));
+    const key = isHigh ? noteNum + 'h' : String(noteNum);
+    return NOTE_FREQ[key] || NOTE_FREQ[String(noteNum)];
+  });
+}
+
+// ===== Song Structure =====
+// Each section: array of { notes: string, beats: number, lyrics: string }
+const SECTIONS = {
+  verse1: [
+    { notes: "3 5 6 5 3 5 2 1 6 1 2 3 2", beats: 4, lyric: "剑指苍穹问九天" },
+    { notes: "3 5 6 5 3 2 2 1 6 5 6 1 1", beats: 4, lyric: "上官门下出英贤" },
+    { notes: "3 3 5 5 6 6 5 3 2 2 1 6 6", beats: 4, lyric: "三代单传吕家骨" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "轩昂气宇镇河山" },
+    { notes: "3 3 5 5 6 6 5 3 2 2 1 6 6", beats: 4, lyric: "十岁能挽三石弓" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "十五剑挑九华山" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "一双星眸寒似月" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "一身傲骨韧如磐" }
+  ],
+  pre: [
+    { notes: "5 3 5 6 5 3 6 5 6 1h 1 6", beats: 4, lyric: "江湖令 传四方" },
+    { notes: "5 3 5 6 5 3 1 1 1 1 1", beats: 4, lyric: "谁与争锋论短长" },
+    { notes: "5 3 5 6 5 3 6 5 6 1h 1 6", beats: 4, lyric: "吕轩阁 藏秘典" },
+    { notes: "1h 2h 3h 2h 1h 6 5 3 2 1", beats: 4, lyric: "一剑光寒十九州！" }
+  ],
+  chorus: [
+    { notes: "3 3 5 5 6 6 1h 1h 6 6 5 3 2 2 1 6", beats: 4, lyric: "哈！上官吕轩！" },
+    { notes: "3 3 5 5 6 6 1h 1h 2 2 3 2 1", beats: 4, lyric: "刀光剑影何所惧" },
+    { notes: "3 3 5 5 6 6 1h 1h 2 2 3 2 1", beats: 4, lyric: "一杯浊酒酬知己" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "万千敌寇等闲看" },
+    { notes: "3 3 5 5 6 6 1h 1h 6 6 5 3 2 2 1 6", beats: 4, lyric: "哈！上官吕轩！" },
+    { notes: "3 3 5 5 6 6 1h 1h 2 2 3 2 1", beats: 4, lyric: "白衣胜雪踏风来" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "剑鞘一抹朱砂印" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "江湖从此留传说" }
+  ],
+  bridge: [
+    { notes: "6 1 2 3 2 1 6 5 3 5 6 1h 6", beats: 4, lyric: "高处寒 孤影单" },
+    { notes: "6 1 2 3 2 1 6 5 3 5 6 1h 6", beats: 4, lyric: "谁懂侠客心底酸" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "名成身退江湖隐" },
+    { notes: "3 5 6 1h 6 5 3 2 1 6 5 3 1", beats: 4, lyric: "只余残剑伴青山" }
+  ]
+};
+
+// ===== Play a section with visual feedback =====
+async function playSection(sectionKey) {
+  initAudio();
+  if (isPlaying) { stopFlag = true; await new Promise(r => setTimeout(r, 200)); }
+  stopFlag = false;
+  isPlaying = true;
+  
+  const sections = sectionKey === 'verse1' ? ['verse1'] 
+                 : sectionKey === 'pre' ? ['pre']
+                 : sectionKey === 'chorus' ? ['chorus']
+                 : sectionKey === 'bridge' ? ['bridge']
+                 : Object.keys(SECTIONS);
+  
+  const totalItems = sections.reduce((sum, k) => sum + SECTIONS[k].length, 0);
+  let playedItems = 0;
+  
+  for (const key of sections) {
+    const section = SECTIONS[key];
+    
+    // Section intro chord
+    const now = audioCtx.currentTime;
+    const chordMap = {
+      verse1: [NOTE_FREQ['1'], NOTE_FREQ['3'], NOTE_FREQ['5']],
+      pre: [NOTE_FREQ['1'] * Math.pow(2, -2/12), NOTE_FREQ['3'] * Math.pow(2, -2/12), NOTE_FREQ['5'] * Math.pow(2, -2/12)],
+      chorus: [NOTE_FREQ['1'], NOTE_FREQ['3'], NOTE_FREQ['5']],
+      bridge: [NOTE_FREQ['6'], NOTE_FREQ['1'], NOTE_FREQ['3']]
+    };
+    playChord(chordMap[key], now, 2);
+    
+    for (const item of section) {
+      if (stopFlag) break;
+      
+      // Update display
+      document.getElementById('currentNote').textContent = '🎤 ' + item.lyric;
+      document.getElementById('progress').style.width = (playedItems / totalItems * 100) + '%';
+      playedItems++;
+      
+      // Play melody notes
+      const freqs = parseNotes(item.notes);
+      const totalDuration = item.beats * BEAT;
+      const perNote = totalDuration / freqs.length;
+      
+      let t = audioCtx.currentTime + 0.05;
+      for (const f of freqs) {
+        if (stopFlag) break;
+        playNote(f, t, perNote * 0.9, 'sine', 0.35);
+        // Add a subtle harmonic
+        playNote(f * 2, t, perNote * 0.6, 'triangle', 0.08);
+        t += perNote;
+      }
+      
+      // Wait for this line to finish
+      await new Promise(r => setTimeout(r, totalDuration * 1000 + 50));
+    }
+  }
+  
+  isPlaying = false;
+  document.getElementById('currentNote').textContent = '✅ 播放完毕';
+  document.getElementById('progress').style.width = '100%';
+}
+
+async function playAll() {
+  initAudio();
+  if (isPlaying) { stopFlag = true; await new Promise(r => setTimeout(r, 200)); }
+  stopFlag = false;
+  isPlaying = true;
+  
+  const order = ['verse1', 'pre', 'chorus', 'verse1', 'pre', 'chorus', 'bridge', 'chorus'];
+  const totalItems = order.reduce((sum, k) => sum + SECTIONS[k].length, 0);
+  let playedItems = 0;
+  
+  for (const key of order) {
+    if (stopFlag) break;
+    const section = SECTIONS[key];
+    
+    // Small gap between sections
+    await new Promise(r => setTimeout(r, 300));
+    
+    for (const item of section) {
+      if (stopFlag) break;
+      
+      document.getElementById('currentNote').textContent = '🎤 ' + item.lyric;
+      document.getElementById('progress').style.width = (playedItems / totalItems * 100) + '%';
+      playedItems++;
+      
+      const freqs = parseNotes(item.notes);
+      const totalDuration = item.beats * BEAT;
+      const perNote = totalDuration / freqs.length;
+      
+      let t = audioCtx.currentTime + 0.05;
+      for (const f of freqs) {
+        if (stopFlag) break;
+        playNote(f, t, perNote * 0.9, 'sine', 0.35);
+        playNote(f * 2, t, perNote * 0.6, 'triangle', 0.08);
+        t += perNote;
+      }
+      
+      await new Promise(r => setTimeout(r, totalDuration * 1000 + 50));
+    }
+  }
+  
+  isPlaying = false;
+  document.getElementById('currentNote').textContent = '✅ 全曲播放完毕';
+  document.getElementById('progress').style.width = '100%';
+}
+
+function stopAll() {
+  stopFlag = true;
+  setTimeout(() => {
+    isPlaying = false;
+    document.getElementById('currentNote').textContent = '⏹ 已停止';
+  }, 300);
+}
+</script>
+</body>
+</html>
