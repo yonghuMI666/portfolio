@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 视频对比研究 · 这么近那么美，周末到河北</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+        background: #0a1f1c;
+        min-height: 100vh;
+        color: #f5f0e6;
+        overflow-x: hidden;
+        line-height: 1.7;
+    }
+    .bg-deco {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    }
+    .bg-deco::before {
+        content: ""; position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 800px 400px at 80% 10%, rgba(212,175,55,0.08), transparent 60%),
+            radial-gradient(ellipse 1000px 500px at 10% 90%, rgba(64,145,128,0.1), transparent 60%);
+    }
+    .mountains {
+        position: absolute; bottom: 0; left: 0; right: 0; height: 200px; opacity: 0.18;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,200 L200,80 L400,150 L600,60 L800,140 L1000,90 L1200,160 L1200,200 Z' fill='%23d4af37'/%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: bottom; background-size: cover;
+    }
+    .moon {
+        position: absolute; top: 60px; right: 8%;
+        width: 140px; height: 140px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f0d98c, #d4af37 60%, #b8952e);
+        box-shadow: 0 0 60px rgba(212,175,55,0.35), inset -15px -10px 30px rgba(0,0,0,0.15);
+        opacity: 0.85;
+    }
+    .stars { position: absolute; inset: 0; }
+    .star { position: absolute; background: #f0d98c; border-radius: 50%; box-shadow: 0 0 6px #d4af37; }
+
+    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 60px 40px 80px; }
+
+    .back-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 22px; border-radius: 999px;
+        background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.35);
+        color: #f0d98c; font-size: 14px; text-decoration: none;
+        transition: all 0.3s ease; margin-bottom: 50px;
+    }
+    .back-btn:hover { background: rgba(212,175,55,0.18); border-color: rgba(212,175,55,0.7); transform: translateX(-4px); }
+
+    header { text-align: center; margin-bottom: 60px; animation: fadeDown 0.9s ease both; }
+    header .tag {
+        display: inline-block; padding: 6px 22px; border: 1px solid rgba(212,175,55,0.4);
+        border-radius: 999px; font-size: 13px; letter-spacing: 4px; color: #d4af37;
+        margin-bottom: 24px; backdrop-filter: blur(6px); background: rgba(212,175,55,0.05);
+    }
+    header h1 {
+        font-size: 50px; font-weight: 800; letter-spacing: 4px;
+        background: linear-gradient(135deg, #f0d98c 0%, #d4af37 40%, #f5e6b8 70%, #c9a133 100%);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        margin-bottom: 18px; line-height: 1.3;
+    }
+    header p.subtitle { font-size: 17px; color: rgba(245,240,230,0.7); letter-spacing: 1.5px; }
+    header .meta {
+        margin-top: 24px; display: inline-flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+        font-size: 13px; color: rgba(245,240,230,0.55); letter-spacing: 1px;
+    }
+    .meta .dot { color: #d4af37; }
+
+    /* 双视频对比区 */
+    .videos-section {
+        margin-bottom: 70px; animation: fadeUp 0.9s 0.2s ease both;
+    }
+    .section-title {
+        text-align: center; font-size: 28px; font-weight: 700; letter-spacing: 3px;
+        color: #f0d98c; margin-bottom: 14px;
+        display: flex; align-items: center; justify-content: center; gap: 20px;
+    }
+    .section-title::before, .section-title::after {
+        content: ""; height: 1px; width: 80px;
+        background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    }
+    .section-sub { text-align: center; color: rgba(245,240,230,0.55); font-size: 14px; letter-spacing: 2px; margin-bottom: 36px; }
+
+    .videos-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;
+    }
+    .video-card {
+        background: rgba(212,175,55,0.04);
+        border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 20px; overflow: hidden;
+        transition: all 0.4s ease;
+    }
+    .video-card:hover { transform: translateY(-6px); border-color: rgba(212,175,55,0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .video-frame {
+        background: #000; aspect-ratio: 9/16; max-height: 520px; margin: 0 auto;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .video-frame video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .video-info { padding: 24px 28px 28px; }
+    .video-info h3 { font-size: 20px; color: #f0d98c; letter-spacing: 1.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+    .video-info .tool-badge {
+        font-size: 11px; padding: 3px 12px; border-radius: 999px;
+        background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.45); color: #d4af37;
+        letter-spacing: 1px;
+    }
+    .video-info .tagline { font-size: 13px; color: rgba(245,240,230,0.6); margin-bottom: 14px; letter-spacing: 0.5px; }
+    .video-info .key-points { display: flex; flex-wrap: wrap; gap: 8px; }
+    .key-points span {
+        font-size: 12px; padding: 4px 12px; border-radius: 999px;
+        background: rgba(64,145,128,0.12); border: 1px solid rgba(64,145,128,0.35); color: #8fc9b8;
+    }
+
+    /* 数据表 */
+    .table-section {
+        margin-bottom: 70px; animation: fadeUp 0.9s ease both;
+    }
+    .table-card {
+        background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.2);
+        border-radius: 18px; overflow: hidden; backdrop-filter: blur(8px);
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+    thead th {
+        background: linear-gradient(90deg, rgba(212,175,55,0.18), rgba(212,175,55,0.08));
+        color: #f0d98c; font-weight: 700; letter-spacing: 1.5px;
+        padding: 16px 18px; text-align: left; font-size: 14px;
+        border-bottom: 1px solid rgba(212,175,55,0.3);
+    }
+    tbody td {
+        padding: 14px 18px; color: rgba(245,240,230,0.82);
+        border-bottom: 1px solid rgba(212,175,55,0.1);
+        line-height: 1.7; vertical-align: top;
+    }
+    tbody tr:hover { background: rgba(212,175,55,0.05); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody td:first-child { color: #d4af37; font-weight: 600; letter-spacing: 0.5px; white-space: nowrap; }
+
+    .winner {
+        display: inline-block; padding: 3px 12px; border-radius: 999px;
+        font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    }
+    .winner.cg { background: rgba(64,145,128,0.2); color: #8fc9b8; border: 1px solid rgba(64,145,128,0.5); }
+    .winner.db { background: rgba(212,175,55,0.18); color: #f0d98c; border: 1px solid rgba(212,175,55,0.55); }
+
+    /* 总结区 */
+    .insight-card {
+        background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(64,145,128,0.06));
+        border: 1px solid rgba(212,175,55,0.3); border-radius: 20px;
+        padding: 40px 45px; margin-bottom: 50px;
+        animation: fadeUp 0.9s ease both;
+    }
+    .insight-card h2 {
+        font-size: 24px; color: #f0d98c; letter-spacing: 2px; margin-bottom: 20px;
+        display: flex; align-items: center; gap: 12px;
+    }
+    .insight-card h2::before { content: ""; width: 4px; height: 24px; background: linear-gradient(180deg, #d4af37, transparent); border-radius: 2px; }
+    .insight-card p { color: rgba(245,240,230,0.85); font-size: 15.5px; line-height: 2; margin-bottom: 14px; }
+    .insight-card p:last-child { margin-bottom: 0; }
+    .insight-card strong { color: #f0d98c; font-weight: 600; }
+
+    footer { text-align: center; margin-top: 60px; font-size: 13px; color: rgba(245,240,230,0.4); letter-spacing: 1.5px; line-height: 2; }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 720px) {
+        header h1 { font-size: 30px; letter-spacing: 2px; }
+        .container { padding: 40px 20px 60px; }
+        table { font-size: 13px; }
+        thead th, tbody td { padding: 10px 12px; }
+        .moon { width: 90px; height: 90px; top: 40px; }
+        .insight-card { padding: 28px 24px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="bg-deco">
+    <div class="moon"></div>
+    <div class="mountains"></div>
+    <div class="stars" id="stars"></div>
+</div>
+
+<div class="container">
+
+    <a href="./index.html" class="back-btn">← 返回作品集</a>
+
+    <header>
+        <div class="tag">作品 07 · AI 视频对比研究</div>
+        <h1>这么近那么美<br>周末到河北</h1>
+        <p class="subtitle">同一句文旅口号，两种 AI 视频生成工具的横向测评</p>
+        <div class="meta">
+            <span>🎬 双 AI 视频</span><span class="dot">·</span>
+            <span>📊 三维对比</span><span class="dot"></span>
+            <span>🏆 7 维度胜负评定</span>
+        </div>
+    </header>
+
+    <!-- 双视频对比 -->
+    <section class="videos-section">
+        <h2 class="section-title">双片对比</h2>
+        <p class="section-sub">SIDE-BY-SIDE COMPARISON</p>
+        <div class="videos-grid">
+            <div class="video-card">
+                <div class="video-frame">
+                    <video controls preload="metadata" playsinline>
+                        <source src="./videos/chatgpt-hebei.mp4" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>视频 ① <span class="tool-badge">ChatGPT 制作</span></h3>
+                    <p class="tagline">扁平矢量插画风 · 动态文字海报</p>
+                    <div class="key-points">
+                        <span>720×1280 高清</span>
+                        <span>无水印</span>
+                        <span>522KB 轻巧</span>
+                        <span>静音</span>
+                    </div>
+                </div>
+            </div>
+            <div class="video-card">
+                <div class="video-frame">
+                    <video controls preload="metadata" playsinline>
+                        <source src="./videos/doubao-hebei.mp4" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>视频 ② <span class="tool-badge">豆包</span></h3>
+                    <p class="tagline">AI 生成写实叙事短片 · 实拍感 footage</p>
+                    <div class="key-points">
+                        <span>406×720 标清</span>
+                        <span>带"豆包AI生成"水印</span>
+                        <span>4.68MB</span>
+                        <span>AAC 立体声 + 人声旁白</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 表 1: 技术参数对比 -->
+    <section class="table-section">
+        <h2 class="section-title">技术参数对比</h2>
+        <p class="section-sub">TECHNICAL SPECIFICATIONS</p>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>对比项</th><th>视频 ① ChatGPT</th><th>视频 ② 豆包</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>文件名</td><td>这么近那么美_周末到河北.mp4</td><td>李欣彤分享的视频.mp4</td></tr>
+                    <tr><td>封装格式</td><td>MP4</td><td>MP4</td></tr>
+                    <tr><td>时长</td><td>15.0 秒</td><td>15.09 秒</td></tr>
+                    <tr><td>分辨率</td><td>720 × 1280（竖屏）</td><td>406 × 720（竖屏，非标准宽度）</td></tr>
+                    <tr><td>宽高比</td><td>9:16 标准</td><td>≈9:16（406:720，略窄）</td></tr>
+                    <tr><td>视频编码</td><td>H.264</td><td>H.264</td></tr>
+                    <tr><td>帧率</td><td>24 fps</td><td>24.1 fps</td></tr>
+                    <tr><td>视频码率</td><td>282 kbps</td><td>2495 kbps（约 2.5 Mbps）</td></tr>
+                    <tr><td>总码率</td><td>285 kbps</td><td>2599 kbps</td></tr>
+                    <tr><td>文件大小</td><td>约 522 KB（0.52 MB）</td><td>约 4.68 MB（大 8.9 倍）</td></tr>
+                    <tr><td>动态范围</td><td>SDR</td><td>SDR</td></tr>
+                    <tr><td>音频轨</td><td>无音轨（静音）</td><td>AAC 立体声</td></tr>
+                    <tr><td>音频码率 / 采样</td><td>—</td><td>128 kbps / 44.1 kHz / 双声道</td></tr>
+                    <tr><td>画面水印</td><td>无</td><td>有 "豆包 AI 生成" 水印</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 表 2: 内容叙事对比 -->
+    <section class="table-section">
+        <h2 class="section-title">内容与叙事对比</h2>
+        <p class="section-sub">CONTENT & NARRATIVE</p>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>对比项</th><th>视频 ① ChatGPT</th><th>视频 ② 豆包</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>视频类型</td><td>扁平矢量插画风动态文字海报（Motion Graphics）</td><td>AI 生成写实叙事短片（实拍感 footage）</td></tr>
+                    <tr><td>画面构成</td><td>深青绿渐变背景 + 抽象波浪山形 + 金色日月圆 + 星点，全程无实景</td><td>地铁通勤男→发光水墨车票→展开长城画卷→山海关日出→草原奔马→古建斗拱→标语收尾</td></tr>
+                    <tr><td>叙事结构</td><td>无人物、无故事线，纯标题文字逐行浮现 + 底部卖点轮播</td><td>完整情绪弧：都市疲惫（冷色地铁）→ 一张车票"翻篇" → 穿越山海草原古建 → 品牌口号</td></tr>
+                    <tr><td>人声旁白</td><td>无</td><td>有："城市的烦恼 / 一张车票就翻篇 / 山海草原古建 / 都在周末的距离里 / 这么近那么美，周末到河北"</td></tr>
+                    <tr><td>背景音乐</td><td>无</td><td>有（随旁白配乐）</td></tr>
+                    <tr><td>屏幕文字</td><td>大标题"这么近・那么美・周末到河北"逐行打出；底部 CTA 按钮"周末到河北→"；卖点文案三屏轮播</td><td>仅结尾蓝底出现"这么近 那么美 周末到河北"白字</td></tr>
+                    <tr><td>视觉风格</td><td>极简扁平、配色统一（墨绿 + 烫金）、排版精致、设计感强</td><td>电影感写实镜头、冷暖色调切换（地铁冷蓝→风光暖金）、运镜丰富</td></tr>
+                    <tr><td>画面感染力</td><td>弱，像一张会动的海报 / PPT</td><td>强，有代入感和情绪起伏</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 表 3: 综合评价 -->
+    <section class="table-section">
+        <h2 class="section-title">综合评价 · 七维胜负</h2>
+        <p class="section-sub">FINAL VERDICT</p>
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr><th>维度</th><th>胜出方</th><th>说明</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>技术参数（分辨率）</td><td><span class="winner cg">ChatGPT</span></td><td>720×1280 画布更高清</td></tr>
+                    <tr><td>技术参数（完整度）</td><td><span class="winner db">豆包</span></td><td>有声有色（AAC 立体声 + 人声旁白），ChatGPT 版完全静音</td></tr>
+                    <tr><td>文件体积 / 轻便</td><td><span class="winner cg">ChatGPT</span></td><td>仅 522KB，适合做封面图 / 海报式预告</td></tr>
+                    <tr><td>叙事与感染力</td><td><span class="winner db">豆包</span></td><td>有人物、有故事弧、有配音，是一条完整可投放的文旅短片</td></tr>
+                    <tr><td>设计精致度</td><td><span class="winner cg">ChatGPT</span></td><td>矢量排版干净统一，无 AI 生成痕迹和水印</td></tr>
+                    <tr><td>落地实用性</td><td><span class="winner db">豆包</span></td><td>可直接作为宣传短片发布；ChatGPT 版更像 KV 主视觉动效</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- 心得 -->
+    <div class="insight-card">
+        <h2>研究心得</h2>
+        <p>本次对比研究以河北文旅宣传口号 <strong>"这么近那么美，周末到河北"</strong> 为题，让 <strong>ChatGPT</strong> 与 <strong>豆包</strong> 两款 AI 各自生成一条 15 秒短视频，再从技术参数、内容叙事、综合表现三个维度横向测评。</p>
+        <p>结果显示两者各有所长：<strong>ChatGPT 走"极简海报动效"路线</strong>——分辨率高、体积轻巧、设计精致，但缺少声音和故事；<strong>豆包走"电影感叙事"路线</strong>——画面有感染力、配音完整、有情绪起伏，可直接投放，但分辨率较低且带水印。</p>
+        <p>这次实践让我认识到：<strong>AI 工具没有绝对优劣，关键在于"使用场景匹配"</strong>。做封面、海报、品牌 KV，选 ChatGPT；做完整叙事广告、短视频投放，选豆包。未来在使用 AI 创作时，应该先明确目标场景，再选择合适的工具。</p>
+    </div>
+
+    <footer>
+        人工智能课程学习成果 · 作品 07<br>
+        AI 视频对比研究 · 2026-11-02
+    </footer>
+
+</div>
+
+<script>
+// 生成星星
+(function() {
+    const container = document.getElementById('stars');
+    const count = 40;
+    for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 2 + 1;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 70 + '%';
+        star.style.opacity = 0.3 + Math.random() * 0.6;
+        container.appendChild(star);
+    }
+})();
+</script>
+
+</body>
+</html>
