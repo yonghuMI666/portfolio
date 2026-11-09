@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>体育教育专业介绍 · 演示文稿设计</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+        --bg: #14322b;
+        --bg-2: #0e2620;
+        --panel: rgba(255,255,255,0.04);
+        --line: rgba(255,255,255,0.12);
+        --accent: #ea5a2f;
+        --accent-soft: rgba(234,90,47,0.14);
+        --ink: #f2f5f3;
+        --muted: rgba(242,245,243,0.6);
+    }
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.75;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+    .deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .deco .ring {
+        position: absolute; border: 1px solid rgba(255,255,255,0.06); border-radius: 50%;
+    }
+    .deco .r1 { width: 620px; height: 620px; top: -120px; right: -160px; }
+    .deco .r2 { width: 460px; height: 460px; top: -40px; right: -80px; }
+    .deco .r3 { width: 300px; height: 300px; top: 40px; right: 0; }
+    .deco .glow {
+        position: absolute; width: 900px; height: 900px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(234,90,47,0.10), transparent 65%);
+        bottom: -420px; left: -260px;
+    }
+
+    .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 56px 40px 90px; }
+
+    .back {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 9px 20px; border-radius: 999px; text-decoration: none;
+        border: 1px solid var(--line); background: var(--panel);
+        color: var(--muted); font-size: 13.5px; transition: .25s;
+    }
+    .back:hover { color: var(--ink); border-color: rgba(234,90,47,.55); background: var(--accent-soft); }
+
+    header { padding: 56px 0 64px; border-bottom: 1px solid var(--line); margin-bottom: 60px; }
+    .kicker {
+        font-size: 12px; letter-spacing: 5px; color: var(--accent);
+        font-weight: 700; margin-bottom: 22px;
+    }
+    h1 {
+        font-size: 62px; font-weight: 900; letter-spacing: 2px; line-height: 1.15;
+        margin-bottom: 22px;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lede { font-size: 19px; color: var(--muted); max-width: 760px; margin-bottom: 26px; }
+    .facts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .facts span {
+        font-size: 12.5px; padding: 6px 15px; border-radius: 6px;
+        background: var(--panel); border: 1px solid var(--line); color: var(--muted);
+        letter-spacing: .5px;
+    }
+
+    section { margin-bottom: 76px; }
+    .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; }
+    .sec-num {
+        font-size: 13px; font-weight: 800; letter-spacing: 2px; color: var(--accent);
+        font-family: ui-monospace, Consolas, monospace;
+    }
+    .sec-head h2 { font-size: 27px; font-weight: 800; letter-spacing: 1px; }
+    .sec-head .en {
+        font-size: 12px; letter-spacing: 3px; color: rgba(242,245,243,0.32);
+        text-transform: uppercase; margin-left: auto; font-weight: 600;
+    }
+
+    /* 幻灯片画廊 */
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .shot {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+        overflow: hidden; cursor: zoom-in; transition: .3s;
+    }
+    .shot:hover { border-color: rgba(234,90,47,.6); transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,.45); }
+    .shot img { width: 100%; display: block; aspect-ratio: 16/9; object-fit: cover; }
+    .shot .cap {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; font-size: 12.5px; color: var(--muted);
+    }
+    .shot .cap b { color: var(--accent); font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; }
+
+    /* 工具展示 */
+    .tool-box {
+        border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+        background: var(--panel);
+    }
+    .tool-bar {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+        padding: 14px 18px; border-bottom: 1px solid var(--line);
+        font-size: 13px; color: var(--muted);
+    }
+    .tool-bar .name {
+        font-family: ui-monospace, Consolas, monospace; font-size: 12.5px;
+        color: var(--ink); font-weight: 600;
+    }
+    .tool-bar a {
+        margin-left: auto; padding: 6px 16px; border-radius: 7px;
+        background: var(--accent-soft); border: 1px solid rgba(234,90,47,.4);
+        color: var(--accent); text-decoration: none; font-size: 12.5px; font-weight: 600;
+        transition: .2s;
+    }
+    .tool-bar a:hover { background: rgba(234,90,47,.24); }
+    .tool-box iframe { width: 100%; height: 620px; border: none; display: block; background: #fff; }
+
+    /* 内容要点 */
+    .points { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .point {
+        padding: 26px 26px 28px; border-radius: 12px;
+        background: var(--panel); border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+    }
+    .point h3 { font-size: 16.5px; margin-bottom: 10px; letter-spacing: .5px; }
+    .point p { font-size: 14px; color: var(--muted); line-height: 1.85; }
+
+    /* 下载 */
+    .downloads { display: flex; flex-wrap: wrap; gap: 16px; }
+    .dl {
+        display: inline-flex; align-items: center; gap: 12px;
+        padding: 16px 26px; border-radius: 10px; text-decoration: none;
+        border: 1px solid var(--line); background: var(--panel);
+        color: var(--ink); font-size: 14.5px; transition: .25s;
+    }
+    .dl:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-3px); }
+    .dl .ico { font-size: 20px; }
+    .dl small { display: block; font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+    .note {
+        padding: 34px 38px; border-radius: 12px;
+        background: linear-gradient(135deg, rgba(234,90,47,.10), rgba(255,255,255,.03));
+        border: 1px solid rgba(234,90,47,.28);
+    }
+    .note h3 { font-size: 19px; margin-bottom: 16px; letter-spacing: .5px; color: #ffb59a; }
+    .note p { font-size: 14.5px; color: rgba(242,245,243,.82); line-height: 2; margin-bottom: 12px; }
+    .note p:last-child { margin-bottom: 0; }
+    .note strong { color: #ffcbb9; }
+
+    footer { text-align: center; font-size: 12.5px; color: rgba(242,245,243,.35); letter-spacing: 1.5px; line-height: 2; border-top: 1px solid var(--line); padding-top: 40px; }
+
+    /* 灯箱 */
+    .lightbox {
+        position: fixed; inset: 0; background: rgba(6,16,13,.94); z-index: 100;
+        display: none; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out;
+    }
+    .lightbox.on { display: flex; }
+    .lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; box-shadow: 0 30px 80px rgba(0,0,0,.7); }
+
+    @media (max-width: 760px) {
+        .wrap { padding: 30px 20px 60px; }
+        h1 { font-size: 34px; }
+        .lede { font-size: 16px; }
+        header { padding: 30px 0 40px; margin-bottom: 40px; }
+        .sec-head { flex-wrap: wrap; gap: 8px; }
+        .sec-head .en { display: none; }
+        .tool-box iframe { height: 520px; }
+        .note { padding: 26px 22px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="deco">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <div class="glow"></div>
+</div>
+
+<div class="wrap">
+
+    <a href="./index.html" class="back">← 返回作品集</a>
+
+    <header>
+        <div class="kicker">MAJOR BRIEFING · 作品 08</div>
+        <h1>体育<em>教育</em>专业<br>介绍演示文稿</h1>
+        <p class="lede">从操场到课堂 —— 一份 13 页的专业认知演示文稿，以及生成它所用的 SKILL.md 源码对照预览工具。</p>
+        <div class="facts">
+            <span>13 页幻灯片</span>
+            <span>PPTX 演示文稿</span>
+            <span>SKILL.md 规范驱动</span>
+            <span>源码对照预览工具</span>
+        </div>
+    </header>
+
+    <!-- 01 成品幻灯片 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">01</span>
+            <h2>成品幻灯片</h2>
+            <span class="en">Deliverable</span>
+        </div>
+        <div class="gallery">
+            <div class="shot"><img src="./assets/pe-major/slides/slide-01.jpg" alt="封面" loading="lazy"><div class="cap"><b>01</b>封面 · 专业主视觉</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-02.jpg" alt="开场" loading="lazy"><div class="cap"><b>02</b>开场 · 一个问题与目录</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-03.jpg" alt="专业定位" loading="lazy"><div class="cap"><b>03</b>专业定位 · 代码 040201</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-04.jpg" alt="培养目标" loading="lazy"><div class="cap"><b>04</b>培养目标 · 四种角色</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-05.jpg" alt="课程地图" loading="lazy"><div class="cap"><b>05</b>课程地图 · 四大模块</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-06.jpg" alt="为什么是现在" loading="lazy"><div class="cap"><b>06</b>为什么是现在 · 数据支撑</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-07.jpg" alt="能力结构" loading="lazy"><div class="cap"><b>07</b>能力结构 · 五种底盘</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-08.jpg" alt="实践体系" loading="lazy"><div class="cap"><b>08</b>实践体系 · 四年贯通</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-09.jpg" alt="证书路径" loading="lazy"><div class="cap"><b>09</b>证书路径 · 五张清单</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-10.jpg" alt="出口" loading="lazy"><div class="cap"><b>10</b>出口 · 主航道与支线</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-11.jpg" alt="大环境" loading="lazy"><div class="cap"><b>11</b>大环境 · 四个时间点</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-12.jpg" alt="三个疑问" loading="lazy"><div class="cap"><b>12</b>三个疑问 · 破除误解</div></div>
+            <div class="shot"><img src="./assets/pe-major/slides/slide-13.jpg" alt="结语" loading="lazy"><div class="cap"><b>13</b>结语 · 让每个孩子爱上运动</div></div>
+        </div>
+    </section>
+
+    <!-- 02 制作工具 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">02</span>
+            <h2>制作工具 · SKILL.md 源码对照预览</h2>
+            <span class="en">Tooling</span>
+        </div>
+        <p class="lede" style="font-size:15px;margin-bottom:22px;">演示文稿由 <strong>pptx Skill</strong> 驱动生成。为了方便理解一个 Skill 的组织方式，我同时做了一个左右分栏的源码对照预览工具：左栏是高亮后的 SKILL.md 原文，右栏是渲染效果，可以拖动中间分隔条实时调整比例。</p>
+        <div class="tool-box">
+            <div class="tool-bar">
+                <span class="name">skills/pptx/SKILL.md</span>
+                <span>· 源码对照预览</span>
+                <a href="./assets/pe-major/skillmd-source-preview.html" target="_blank" rel="noopener">全屏打开 ↗</a>
+            </div>
+            <iframe src="./assets/pe-major/skillmd-source-preview.html" title="SKILL.md 源码对照预览"></iframe>
+        </div>
+    </section>
+
+    <!-- 03 设计要点 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">03</span>
+            <h2>设计要点</h2>
+            <span class="en">Design Notes</span>
+        </div>
+        <div class="points">
+            <div class="point">
+                <h3>一套配色贯穿全篇</h3>
+                <p>深墨绿底 + 朱橙高亮 + 白字，只用三种颜色。橙色只出现在关键词、数字和强调线上，形成稳定的视觉节奏。</p>
+            </div>
+            <div class="point">
+                <h3>叙事而非罗列</h3>
+                <p>不是把专业信息堆成清单，而是用"一个问题"开场，按「是什么 → 学什么 → 能做什么 → 为什么是现在」推进。</p>
+            </div>
+            <div class="point">
+                <h3>数据作为论据</h3>
+                <p>课时占比 10%–11%、近视率 53.6% 等硬数据单独成页，并标注来源，让"为什么选这个专业"有据可依。</p>
+            </div>
+            <div class="point">
+                <h3>每页只讲一件事</h3>
+                <p>13 页里每页都有一个清晰的单一论点，标题即结论，正文只做支撑，避免信息过载。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04 下载 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">04</span>
+            <h2>下载与查看</h2>
+            <span class="en">Download</span>
+        </div>
+        <div class="downloads">
+            <a class="dl" href="./assets/pe-major/pe-major-intro.pptx" download>
+                <span class="ico">📊</span>
+                <span>下载 PPTX 原文件<small>13 页 · 可编辑</small></span>
+            </a>
+            <a class="dl" href="./assets/pe-major/skillmd-source-preview.html" target="_blank" rel="noopener">
+                <span class="ico">🧩</span>
+                <span>打开源码对照预览<small>SKILL.md 分栏工具</small></span>
+            </a>
+        </div>
+    </section>
+
+    <div class="note">
+        <h3>这一次学到了什么</h3>
+        <p>以前做演示文稿，习惯先打开软件、再想怎么排版，最后才补内容——顺序是反的。</p>
+        <p>这次先读 <strong>SKILL.md</strong>，把「内容结构、设计规范、常见错误」这些约束前置，再让工具按规范生成初稿，最后人工调整。结果是<strong>排版风格从头到尾一致</strong>，不用一页页去对齐字号和颜色。</p>
+        <p>更大的收获是理解了 <strong>Skill 的本质</strong>：它不是一段代码，而是一份把"怎么做才对"写清楚的说明书。<strong>把经验沉淀成规范，比把经验留在脑子里更有价值。</strong></p>
+    </div>
+
+    <footer>
+        人工智能课程学习成果 · 作品 08<br>
+        体育教育专业介绍演示文稿 · 2026-11
+    </footer>
+
+</div>
+
+<div class="lightbox" id="lightbox"><img src="" alt="放大预览"></div>
+
+<script>
+(function () {
+    var lb = document.getElementById('lightbox');
+    var lbImg = lb.querySelector('img');
+    document.querySelectorAll('.shot').forEach(function (shot) {
+        shot.addEventListener('click', function () {
+            lbImg.src = shot.querySelector('img').src;
+            lb.classList.add('on');
+        });
+    });
+    lb.addEventListener('click', function () { lb.classList.remove('on'); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') lb.classList.remove('on');
+    });
+})();
+</script>
+
+</body>
+</html>
