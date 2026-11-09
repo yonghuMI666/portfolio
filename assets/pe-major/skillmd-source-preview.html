@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SKILL.md — 源码对照预览</title>
+<style>
+  :root{
+    --bg:#ffffff;
+    --panel:#f8f9f8;
+    --panel-2:#f1f4f2;
+    --ink:#16201d;
+    --ink-2:#33413d;
+    --muted:#8b9994;
+    --line:#e4e9e7;
+    --line-soft:#eef1f0;
+    --accent:#c43e1c;
+    --accent-soft:#fdf1ec;
+    --code-bg:#16201d;
+    --left:46%;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+    background:var(--bg);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  .app{height:100%;display:flex;flex-direction:column}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    height:54px;flex:0 0 54px;
+    display:flex;align-items:center;gap:14px;
+    padding:0 16px 0 18px;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+    position:relative;z-index:20;
+  }
+  .badge{
+    width:28px;height:28px;border-radius:8px;
+    background:var(--accent-soft);color:var(--accent);
+    display:grid;place-items:center;font-size:14px;
+    flex:0 0 auto;
+  }
+  .fname{
+    font-family:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:13.5px;font-weight:600;letter-spacing:-.01em;
+  }
+  .fpath{
+    font-size:11.5px;color:var(--muted);margin-left:2px;
+    font-family:ui-monospace,Consolas,monospace;
+    max-width:38vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .meta{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:12px;color:var(--muted)}
+  .meta .dot{width:3px;height:3px;border-radius:50%;background:#cfd8d4}
+  .meta b{color:var(--ink-2);font-weight:600}
+
+  .tools{display:flex;align-items:center;gap:8px;margin-left:6px;padding-left:14px;border-left:1px solid var(--line)}
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    height:30px;padding:0 11px;border-radius:7px;
+    border:1px solid var(--line);background:#fff;color:var(--ink-2);
+    font-size:12px;font-family:inherit;cursor:pointer;
+    transition:.15s ease;
+  }
+  .btn:hover{border-color:#cfd8d4;background:#fbfcfb;color:var(--ink)}
+  .btn.on{background:var(--accent-soft);border-color:#f3cfc2;color:var(--accent)}
+  .btn svg{width:13px;height:13px;display:block}
+  .sw{
+    width:26px;height:15px;border-radius:99px;background:#d9e0dd;position:relative;
+    transition:.18s;flex:0 0 auto;
+  }
+  .sw::after{
+    content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;
+    border-radius:50%;background:#fff;transition:.18s;
+    box-shadow:0 1px 2px rgba(0,0,0,.18);
+  }
+  .btn.on .sw{background:var(--accent)}
+  .btn.on .sw::after{transform:translateX(11px)}
+
+  /* ---------- split ---------- */
+  .split{flex:1;display:flex;min-height:0;position:relative}
+  .pane{display:flex;flex-direction:column;min-width:0;min-height:0}
+  .pane-src{flex:0 0 var(--left);background:var(--panel);border-right:1px solid var(--line)}
+  .pane-prev{flex:1 1 auto;background:#fff}
+
+  .pane-head{
+    flex:0 0 30px;display:flex;align-items:center;gap:8px;
+    padding:0 14px;border-bottom:1px solid var(--line-soft);
+    font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);font-weight:600;
+    background:inherit;
+    position:sticky;top:0;z-index:5;
+  }
+  .pane-src .pane-head{background:var(--panel)}
+  .pane-prev .pane-head{background:#fff}
+  .pane-head .tag{
+    font-family:ui-monospace,Consolas,monospace;font-size:10px;
+    letter-spacing:0;text-transform:none;
+    padding:2px 6px;border-radius:4px;background:var(--panel-2);color:var(--ink-2);
+  }
+  .pane-prev .pane-head .tag{background:#fbf3ef;color:#a8542f}
+
+  .scroller{flex:1;overflow:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#cdd6d2 transparent}
+  .scroller::-webkit-scrollbar{width:11px;height:11px}
+  .scroller::-webkit-scrollbar-thumb{background:#d3dbd7;border-radius:8px;border:3px solid transparent;background-clip:content-box}
+  .scroller::-webkit-scrollbar-thumb:hover{background:#bcc7c2;background-clip:content-box;border:3px solid transparent}
+  .scroller::-webkit-scrollbar-track{background:transparent}
+
+  /* ---------- source code ---------- */
+  .code{
+    padding:14px 0 24vh;
+    font-family:ui-monospace,"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:12.3px;line-height:1.62;
+  }
+  .row{display:flex;padding-right:14px}
+  .row:hover{background:rgba(196,62,28,.045)}
+  .no{
+    flex:0 0 46px;text-align:right;padding-right:12px;
+    color:#b8c3bf;user-select:none;font-size:11.2px;
+    font-variant-numeric:tabular-nums;
+  }
+  .src{flex:1;white-space:pre-wrap;word-break:break-word;color:#3c4a46}
+  .src .s-yaml{color:#93a19c;font-style:italic}
+  .src .s-hash{color:var(--accent);font-weight:700}
+  .src .s-h{color:#16201d;font-weight:700}
+  .src .s-fence{color:#a8542f;font-weight:600}
+  .src .s-str{color:#5c7a6f}
+  .src .s-code{color:#a53a1c;background:#efe9e6;border-radius:3px;padding:0 2px}
+  .src .s-bold{color:#16201d;font-weight:700}
+  .src .s-pipe{color:#c0cac6}
+  .src .s-quote{color:var(--accent);opacity:.7}
+  .src .s-dash{color:#c07a5f;font-weight:600}
+  .row.is-fence{background:#eef2f0}
+  .row.is-head .src{font-size:12.9px}
+
+  /* ---------- divider ---------- */
+  .divider{
+    flex:0 0 7px;cursor:col-resize;position:relative;
+    background:linear-gradient(to right,transparent 3px,var(--line) 3px,var(--line) 4px,transparent 4px);
+    transition:background .15s;z-index:10;
+  }
+  .divider:hover,.divider.dragging{background:linear-gradient(to right,transparent 3px,var(--accent) 3px,var(--accent) 4px,transparent 4px)}
+  .grip{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:3px;height:34px;border-radius:3px;background:#c9d3ce;opacity:0;transition:.15s;
+  }
+  .divider:hover .grip{opacity:1;background:var(--accent)}
+
+  /* ---------- preview ---------- */
+  .md{
+    max-width:830px;margin:0 auto;
+    padding:34px 40px 30vh;
+    font-size:14.7px;line-height:1.78;color:#2b3935;
+  }
+  .md > :first-child{margin-top:0}
+
+  .md h1{
+    font-size:29px;line-height:1.26;letter-spacing:-.022em;
+    margin:0 0 6px;color:var(--ink);font-weight:700;
+  }
+  .md h1 + .doc-meta{
+    display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+    margin:14px 0 30px;padding-bottom:22px;border-bottom:1px solid var(--line-soft);
+  }
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;
+    height:22px;padding:0 8px;border-radius:6px;
+    background:var(--panel-2);color:var(--ink-2);
+    font-size:11.5px;font-weight:600;letter-spacing:.01em;
+  }
+  .chip.k{background:var(--accent);color:#fff}
+  .chip.mono{font-family:ui-monospace,Consolas,monospace;font-weight:500;font-size:11px}
+
+  .md h2{
+    font-size:19px;line-height:1.4;letter-spacing:-.012em;
+    margin:40px 0 14px;padding-bottom:10px;
+    border-bottom:1px solid var(--line-soft);
+    color:var(--ink);font-weight:700;scroll-margin-top:20px;
+  }
+  .md h3{
+    font-size:15.2px;margin:28px 0 10px;color:var(--ink);
+    font-weight:700;letter-spacing:-.005em;scroll-margin-top:20px;
+  }
+  .md h4,.md h5,.md h6{font-size:13.6px;margin:20px 0 8px;color:var(--ink-2);font-weight:700}
+  .md p{margin:0 0 14px}
+  .md strong{color:var(--ink);font-weight:700}
+  .md em{font-style:italic;color:#4a5a55}
+  .md a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(196,62,28,.28);padding-bottom:.5px}
+  .md a:hover{border-bottom-color:var(--accent)}
+  .md hr{border:0;border-top:1px solid var(--line);margin:26px 0}
+
+  .md ul,.md ol{margin:0 0 15px;padding-left:20px}
+  .md li{margin:7px 0;padding-left:2px}
+  .md li::marker{color:#a9b6b1}
+  .md ul li::marker{font-size:.95em}
+
+  .md code{
+    font-family:ui-monospace,Consolas,"Liberation Mono",monospace;
+    font-size:.855em;padding:1.5px 5px;border-radius:4px;
+    background:#f2f5f4;border:1px solid #e7ecea;color:#a53a1c;
+    white-space:nowrap;
+  }
+  .md pre{
+    background:var(--code-bg);color:#d3e2dc;
+    border-radius:10px;padding:15px 17px;margin:0 0 18px;
+    overflow-x:auto;
+    font-size:12.4px;line-height:1.72;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+  }
+  .md pre code{
+    background:none;border:0;padding:0;color:inherit;
+    font-size:inherit;white-space:pre;
+  }
+
+  .md blockquote{
+    margin:16px 0 20px;padding:13px 18px;
+    background:#fdf7f4;border-left:3px solid var(--accent);
+    border-radius:0 8px 8px 0;
+    color:#5a4a44;
+  }
+  .md blockquote p{margin:0;font-size:13.9px;line-height:1.72}
+  .md blockquote p + p{margin-top:6px;color:#7d6a62;font-size:13.2px}
+
+  .md .table-wrap{overflow-x:auto;margin:0 0 20px;border:1px solid var(--line);border-radius:9px}
+  .md table{border-collapse:collapse;width:100%;font-size:13px}
+  .md thead th{
+    background:#f7f9f8;color:var(--ink-2);
+    font-size:11.6px;font-weight:700;letter-spacing:.02em;
+    text-align:left;padding:9px 12px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  .md tbody td{
+    padding:9px 12px;vertical-align:top;
+    border-bottom:1px solid var(--line-soft);
+    line-height:1.66;color:#2f3d39;
+  }
+  .md tbody tr:last-child td{border-bottom:0}
+  .md tbody tr:hover{background:#fcfdfc}
+  .md td code{white-space:normal}
+
+  /* frontmatter card */
+  .fm{
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    margin:22px 0 30px;background:#fcfdfc;
+  }
+  .fm-h{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 13px;background:#f5f8f6;border-bottom:1px solid var(--line);
+    font-family:ui-monospace,Consolas,monospace;
+    font-size:11px;letter-spacing:.03em;color:#7b8a85;
+  }
+  .fm-h b{color:#5a6b65;font-weight:600}
+  .fm-rows{display:grid;grid-template-columns:152px 1fr}
+  .fm-k,.fm-v{padding:7px 13px;font-size:12.4px;border-bottom:1px solid #f0f4f2}
+  .fm-k{
+    font-family:ui-monospace,Consolas,monospace;
+    color:#7b8a85;font-size:11.2px;line-height:1.5;
+    word-break:break-all;
+    background:#fafcfb;border-right:1px solid #f0f4f2;
+  }
+  .fm-v{color:#33413d;line-height:1.68;word-break:break-word}
+  .fm-v .y{font-family:ui-monospace,Consolas,monospace;font-size:11.6px;color:#a53a1c;background:#fbf1ed;padding:1px 5px;border-radius:3px;margin-right:4px;display:inline-block}
+  .fm-rows > *:nth-last-child(1),.fm-rows > *:nth-last-child(2){border-bottom:0}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);
+    background:#16201d;color:#fff;font-size:12.5px;
+    padding:9px 16px;border-radius:8px;opacity:0;pointer-events:none;
+    transition:.22s ease;z-index:99;box-shadow:0 6px 22px rgba(0,0,0,.18);
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:920px){
+    .split{flex-direction:column}
+    .pane-src{flex:0 0 46%;border-right:0;border-bottom:1px solid var(--line)}
+    .divider{display:none}
+    .fpath{display:none}
+    .md{padding:24px 20px 20vh;font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="badge">📊</div>
+    <div style="display:flex;align-items:baseline;gap:8px;min-width:0">
+      <span class="fname">SKILL.md</span>
+      <span class="fpath">skills/pptx/SKILL.md</span>
+    </div>
+    <div class="meta">
+      <span><b id="mVer">pptx</b> v1.2.0</span>
+      <span class="dot"></span>
+      <span><b id="mLines">—</b> 行</span>
+      <span class="dot"></span>
+      <span><b id="mBytes">—</b></span>
+    </div>
+    <div class="tools">
+      <button class="btn on" id="btnSync" title="左右滚动联动">
+        <span class="sw"></span>同步滚动
+      </button>
+      <button class="btn" id="btnCopy">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        复制源码
+      </button>
+    </div>
+  </header>
+
+  <main class="split" id="split">
+
+    <section class="pane pane-src">
+      <div class="pane-head">
+        <span>Source</span>
+        <span class="tag">markdown · 只读</span>
+      </div>
+      <div class="scroller" id="srcScroll">
+        <div class="code" id="code"></div>
+      </div>
+    </section>
+
+    <div class="divider" id="divider"><span class="grip"></span></div>
+
+    <section class="pane pane-prev">
+      <div class="pane-head">
+        <span>Preview</span>
+        <span class="tag">渲染结果</span>
+      </div>
+      <div class="scroller" id="prevScroll">
+        <article class="md" id="mdOut"></article>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast">已复制</div>
+
+<script type="text/plain" id="raw">
+---
+name: pptx
+display_name: "PPT 演示文稿"
+display_name_en: "PowerPoint"
+description: >-
+  Use for anything touching .pptx/.potx: create decks and pitch decks, read and extract slide content and speaker notes, edit, combine, and work with templates and layouts.
+  凡是涉及 .pptx 或 .potx 的任务都用它：创建幻灯片与路演稿、读取与抽取内容（含备注）、编辑与合并、使用模板与版式，输出可直接使用的演示文稿。
+  触发词 / Trigger words：做 PPT、幻灯片、演示文稿、slides、deck、presentation、pptx、pitch deck
+description_zh: "创建、读取、编辑 .pptx/.potx 演示文稿：幻灯片、版式、备注与模板。"
+description_en: "Creates, reads, and edits .pptx/.potx decks: slides, layouts, speaker notes, and templates."
+category: document
+version: "1.2.0"
+author: "zxh"
+disable-model-invocation: false
+user-invocable: true
+title: "PPT 演示文稿 / PowerPoint"
+runtime: generic
+tags: ["PPT", "pptx", "演示文稿", "幻灯片", "pitch deck", "slides", "presentation"]
+dependencies: []
+agent_created: true
+---
+
+# PPTX creation, editing, and analysis
+
+> **语言 / Language**：中文输入请先阅读 `references/zh-CN.md`，并全程使用中文输出；其他语言直接使用下方英文指南。
+> For Chinese input, read `references/zh-CN.md` first and respond in Chinese throughout; otherwise follow the English guide below.
+
+
+A `.pptx` is a ZIP archive of XML files. Choose your approach by task:
+
+| Task | Approach |
+|---|---|
+| **Create** a new deck | Write a `pptxgenjs` script — see gotchas below |
+| **Edit** an existing deck, or build from a template | unzip → edit `ppt/slides/slideN.xml` → zip |
+| **Read** content | `markitdown deck.pptx` (one block per slide under `<!-- Slide number: N -->` markers); visual grid: `python scripts/thumbnail.py deck.pptx` |
+
+## Scripts
+
+Paths are relative to this skill's directory. Everything else is plain Python, `node`, or shell.
+
+| Script | What it does |
+|---|---|
+| `scripts/thumbnail.py deck.pptx [prefix]` | Labeled grid of every slide, for picking template layouts. `.pptx` only. Pass `prefix` — it defaults to `thumbnails`, which overwrites the grids of any other deck done in the same directory |
+| `scripts/add_slide.py unpacked/ slide2.xml [--after slideN.xml]` | Duplicate a slide (or a `slideLayoutN.xml`) with all the package bookkeeping. Also takes a `.pptx` directly with `-o out.pptx` |
+| `scripts/clean.py unpacked/` | Delete slides, media, and rels no longer referenced. Run **after** `<p:sldIdLst>` is final |
+| `scripts/validate.py deck.pptx [--original src.pptx]` | Schema, relationship, content-type, chart and slide checks; each failure names its fix. Pass `--original` for any template-derived deck — it baselines the schema checks against the template, so the template's own XSD errors don't read as yours |
+| `scripts/soffice.py --headless --convert-to pdf deck.pptx` | LibreOffice wrapper — bare `soffice` hangs in this sandbox |
+
+## Creating with pptxgenjs — gotchas
+
+`pptxgenjs` is preinstalled — do not run `npm install` first; write the script and `require('pptxgenjs')` directly. Only if that require fails: `npm install pptxgenjs`. The model knows the API; these are the footguns:
+
+- **Set `pres.layout` before adding slides.** The default canvas is `LAYOUT_16x9` = **10" × 5.625"**, not 13.3" wide. Coordinates past the edge are written, not clamped — the shape just isn't on the slide. (`LAYOUT_WIDE` is 13.3" × 7.5".)
+- **Hex colors: never `#`, never 8 digits.** `color: "FF0000"`. Both `"#FF0000"` and alpha baked into the hex (`"00000020"`) **corrupt the file**. For translucency: `transparency: 0-100` on fills and images, `opacity: 0.0-1.0` on shadows — each is silently ignored on the other.
+- **pptxgenjs mutates option objects in place** (converts values to EMU on first use). Never share one `shadow`/options object across two `add*` calls — build a fresh object each time.
+- **Shadow `offset` must be ≥ 0** — a negative offset corrupts the file. To cast a shadow upward, use `angle: 270` with a positive offset.
+- **`letterSpacing` is silently ignored** — the real option is `charSpacing`.
+- **Lists:** `bullet: true` on each item, never a literal `•` (renders double bullets). Set `breakLine: true` on every array item except the last. Space bulleted paragraphs with `paraSpaceAfter`, not `lineSpacing` (huge gaps).
+- **One `new pptxgen()` per output file** — never reuse an instance.
+- **`rectRadius` only works on `ROUNDED_RECTANGLE`**, not `RECTANGLE`.
+- **Gradient fills aren't supported** — use a gradient image as the background instead.
+- **Text boxes have built-in internal padding** — set `margin: 0` whenever text must align with a shape, line, or icon at the same x.
+- **Speaker notes go in `slide.addNotes("...")`** (plain text, once per slide), never in a text box on the slide.
+- **Keep charts native.** Use `addChart()` for everything PowerPoint can chart (pass an array of `{type, data, options}` for combos). For PowerPoint-native features the library doesn't expose (trendlines, error bars), compute the extra series yourself or post-process the generated OOXML — do not fall back to a rendered image. Only chart types PowerPoint has no native form for (Sankey, network, chord) go in as images.
+- **Default charts render bare** — no title, no data labels, dated palette. Set `showTitle` + `title`, `showValue: true` + `dataLabelPosition`, `chartColors: [...]` from your palette, and quiet the frame (`catAxisLabelColor`/`valAxisLabelColor`, `valGridLine: { color, size }`, `catGridLine: { style: "none" }`, `showLegend: false` for a single series).
+- **On a stacked bar or column chart, `dataLabelPosition` must be `ctr`, `inEnd`, or `inBase`.** `outEnd` **corrupts the file**.
+- **A combo series using `secondaryValAxis`/`secondaryCatAxis` needs both `valAxes` and `catAxes` on the chart options, two entries each.** Without them pptxgenjs writes axis *ids* it never declares, and PowerPoint **discards that chart** and reports the file as corrupt. Supplying only `valAxes` is not enough.
+- **After `writeFile()`, run `python scripts/validate.py deck.pptx`.** It reports the two chart faults above and the slide-XML defects PowerPoint refuses, and names the fix for each. Fix them in your generator, not by hand-editing the packed XML.
+- **Never reorder the children of `<p:presentation>`.** pptxgenjs writes `<p:notesMasterIdLst>` right after `<p:sldIdLst>` and points both masters at one theme part. PowerPoint reads that happily — move the element and the same deck becomes unopenable.
+- **Icons:** render `react-icons` to SVG (`ReactDOMServer.renderToStaticMarkup`), rasterize with `sharp` at ≥256px, and insert via `addImage({ data: "image/png;base64," + buf.toString("base64") })` — the `image/png;base64,` prefix is required (`react-icons`, `react`, `react-dom`, and `sharp` are preinstalled — `npm install react-icons react react-dom sharp` only if a require fails).
+
+## Editing existing decks and templates
+
+Pick layouts first: `python scripts/thumbnail.py template.pptx template-thumbs` writes a labeled grid of every slide and prints the file(s) it created — `template-thumbs.jpg`, split into `template-thumbs-N.jpg` past 12 slides. **Always pass that second argument, named after the deck.** It defaults to `thumbnails`, so two decks thumbnailed in one directory silently overwrite each other's grids — the first deck's are simply gone (template analysis only — visual QA needs the full-resolution renders from [Converting to Images](#converting-to-images); it only accepts `.pptx`, so copy a `.potx` to a `.pptx` name first). Use it with `markitdown` to map each content section onto a template slide, and vary the layouts — don't put every section on the same title-and-bullets slide.
+
+```bash
+python3 -c "import sys,zipfile; zipfile.ZipFile(sys.argv[1]).extractall('unpacked')" deck.pptx
+python scripts/add_slide.py unpacked/ slide2.xml --after slide2.xml   # duplicate a slide (or slideLayoutN.xml); prints the new slide's path
+# reorder / delete slides = edit <p:sldIdLst> in ppt/presentation.xml
+python scripts/clean.py unpacked/                                     # after deletions: removes orphaned slides, media, rels
+# edit slide content in ppt/slides/slideN.xml
+(cd unpacked && rm -f ../out.pptx && zip -Xr ../out.pptx .)           # zip from INSIDE the dir; rm first or deleted parts survive
+python scripts/validate.py out.pptx --original deck.pptx
+```
+
+- **Do all structural work — add, delete, reorder — before editing any slide's content.** `add_slide.py` copies a slide file verbatim, so duplicating after you edit clones the edited content; and `clean.py` deletes any slide missing from `<p:sldIdLst>`, including one you just wrote.
+- **Never copy a slide file by hand** — `add_slide.py` does every registration a new slide needs and reports what it made (`Created ppt/slides/slide17.xml from slide2.xml`). It also works directly on a file: `add_slide.py deck.pptx slide2.xml -o out.pptx` — **pass `-o`, or it rewrites the input deck in place.** A duplicated slide still *references* its source's chart/SmartArt/embedded-object parts rather than cloning them, so editing one slide's chart changes the other's.
+- **If you use `python-pptx`**, three things it won't do: duplicate a slide (its only entry point is `add_slide(layout)`), preserve formatting through `text_frame.text = "..."` (that collapses the paragraph to a single unstyled run — assign `run.text` instead), or read the SVG/EMF most template art uses (`add_picture` raises `UnidentifiedImageError`).
+- Legacy `.ppt` must be converted first: `python scripts/soffice.py --headless --convert-to pptx file.ppt`. `.potx` templates unpack and pack identically — keep the `.potx` extension on the output.
+- To reuse a template icon or image, duplicate a slide or layout that already contains it.
+
+When filling in a template:
+
+- If you script an XML transform, parse with `defusedxml.minidom` — round-tripping OOXML through `xml.etree.ElementTree` rewrites namespace prefixes and corrupts the deck.
+- **Template slots ≠ source items.** If the template shows 4 team members and you have 3, delete the 4th member's entire group (image + text boxes), not just its text — then check for orphaned visuals in QA.
+- One `<a:p>` per list item — never concatenate items into a single paragraph. Copy the sibling `<a:pPr>` to preserve spacing, and put `b="1"` on the `<a:rPr>` of titles, section headers, and inline labels (`Status:`, `Owner:`).
+- Let bullets inherit from the layout; only add `<a:buChar>`, `<a:buAutoNum>` (numbered), or `<a:buNone>` to override — never a literal `•` in the text.
+- Text with leading or trailing spaces needs `xml:space="preserve"` on its `<a:t>`.
+
+## Design Ideas
+
+**Don't create boring slides.** Plain bullets on a white background won't impress anyone. Consider ideas from this list for each slide.
+
+### Before Starting
+
+- **Pick a bold, content-informed color palette**: The palette should feel designed for THIS topic. If swapping your colors into a completely different presentation would still "work," you haven't made specific enough choices.
+- **Dominance over equality**: One color should dominate (60-70% visual weight), with 1-2 supporting tones and one sharp accent. Never give all colors equal weight.
+- **Dark/light contrast**: Dark backgrounds for title + conclusion slides, light for content ("sandwich" structure). Or commit to dark throughout for a premium feel.
+- **Commit to a visual motif**: Pick ONE distinctive element and repeat it — rounded image frames, icons in colored circles. Carry it across every slide. **Do not use a color bar or accent stripe as your motif** (see Avoid list).
+
+### Color Palettes
+
+Choose colors that match your topic — don't default to generic blue. Use these palettes as inspiration:
+
+| Theme | Primary | Secondary | Accent |
+|-------|---------|-----------|--------|
+| **Midnight Executive** | `1E2761` (navy) | `CADCFC` (ice blue) | `FFFFFF` (white) |
+| **Forest & Moss** | `2C5F2D` (forest) | `97BC62` (moss) | `F5F5F5` (cream) |
+| **Coral Energy** | `F96167` (coral) | `F9E795` (gold) | `2F3C7E` (navy) |
+| **Warm Terracotta** | `B85042` (terracotta) | `E7E8D1` (sand) | `A7BEAE` (sage) |
+| **Ocean Gradient** | `065A82` (deep blue) | `1C7293` (teal) | `21295C` (midnight) |
+| **Charcoal Minimal** | `36454F` (charcoal) | `F2F2F2` (off-white) | `212121` (black) |
+| **Teal Trust** | `028090` (teal) | `00A896` (seafoam) | `02C39A` (mint) |
+| **Berry & Cream** | `6D2E46` (berry) | `A26769` (dusty rose) | `ECE2D0` (cream) |
+| **Sage Calm** | `84B59F` (sage) | `69A297` (eucalyptus) | `50808E` (slate) |
+| **Cherry Bold** | `990011` (cherry) | `FCF6F5` (off-white) | `2F3C7E` (navy) |
+
+### For Each Slide
+
+**Every slide needs a visual element** — image, chart, icon, or shape. Text-only slides are forgettable.
+
+**Layout options:**
+- Two-column (text left, illustration on right)
+- Icon + text rows (icon in colored circle, bold header, description below)
+- 2x2 or 2x3 grid (image on one side, grid of content blocks on other)
+- Half-bleed image (full left or right side) with content overlay
+
+**Data display:**
+- Large stat callouts (big numbers 60-72pt with small labels below)
+- Comparison columns (before/after, pros/cons, side-by-side options)
+- Timeline or process flow (numbered steps, arrows)
+
+**Visual polish:**
+- Icons in small colored circles next to section headers
+- Italic accent text for key stats or taglines
+
+### Typography
+
+**Font names you write into the .pptx are rendered by the user's PowerPoint, not by this environment.** Your visual QA renders via LibreOffice, which substitutes fonts it doesn't have — and for some fonts the substitute has different widths, so your QA preview can show text overflow (or fit) that the real deck won't have. To keep your QA trustworthy:
+
+- **Safe fonts** (render true-to-width in QA *and* ship with Office): **Arial, Calibri, Cambria, Times New Roman, Courier New, Bookman Old Style, Century Schoolbook**. Use these for body text and anything where fit matters.
+- **Headers with personality at zero QA risk**: pair a safe-list serif header (Cambria, Bookman Old Style, Century Schoolbook) with a safe-list sans body (Calibri or Arial). You get visual contrast without giving up reliable overflow checks.
+- **If the user asks for a font outside the safe list** (e.g. Georgia or Trebuchet MS): use it where the user asked, but size those containers with extra slack (~10%) and don't trust QA text-fit on those elements — the preview of that font is approximate. If the user hasn't specified, prefer safe-list fonts for body text.
+- **QA-unreliable fonts** (substitute has different widths — overflow checks can be wrong): Georgia, Trebuchet MS, Impact, Arial Black, Garamond, Consolas, Palatino Linotype. Calibri Light substitution varies by environment; treat as QA-unreliable. Fine for titles/accents with slack; don't trust QA text-fit on these.
+- **Never default to Aptos** — Office's post-2023 default has no metric-compatible substitute here *and* is missing from older Office installs, so it's unreliable on both ends.
+
+| Element | Size |
+|---------|------|
+| Slide title | 36-44pt bold |
+| Section header | 20-24pt bold |
+| Body text | 14-16pt |
+| Captions | 10-12pt muted |
+
+### Spacing
+
+- 0.5" minimum margins
+- 0.3-0.5" between content blocks
+- Leave breathing room—don't fill every inch
+
+### Avoid (Common Mistakes)
+
+- **Don't repeat the same layout** — vary columns, cards, and callouts across slides
+- **Don't center body text** — left-align paragraphs and lists; center only titles
+- **Don't skimp on size contrast** — titles need 36pt+ to stand out from 14-16pt body
+- **Don't default to blue** — pick colors that reflect the specific topic
+- **Don't mix spacing randomly** — choose 0.3" or 0.5" gaps and use consistently
+- **Don't style one slide and leave the rest plain** — commit fully or keep it simple throughout
+- **Don't create text-only slides** — add images, icons, charts, or visual elements; avoid plain title + bullets
+- **Don't forget text box padding** — when aligning lines or shapes with text edges, set `margin: 0` on the text box or offset the shape to account for padding
+- **Don't use low-contrast elements** — icons AND text need strong contrast against the background; avoid light text on light backgrounds or dark text on dark backgrounds
+- **NEVER use accent lines under titles** — these are a hallmark of AI-generated slides; use whitespace or background color instead
+- **NEVER add decorative color bars or accent stripes** — this includes: header/footer bars spanning the slide width, vertical sidebar stripes down one edge of the slide, thin accent stripes along one edge of a card or content block, and "single-side borders" on rectangles. These read as AI-generated filler. If you want to set a card apart, use a subtle background tint, a drop shadow, or an icon — not an edge stripe.
+- **Don't default to cream/beige backgrounds** — when no background is specified, use white (`FFFFFF`) or the user's brand palette; avoid warm-neutral defaults like `F5F5DC`, `FAF0E6`, `FAEBD7`, `FFF8E1`
+- **Don't ship text that overflows its shape** — if text doesn't fit, reduce font size, split across slides, or enlarge the container; never leave content cut off or spilling past bounds
+
+## QA (Required)
+
+Your first render usually has a few real issues — overlaps, overflow, misalignment. Find and fix those, re-render only the slides you changed, and stop.
+
+### Content QA
+
+```bash
+markitdown output.pptx
+```
+
+Check for missing content, typos, wrong order.
+
+**When using templates, check for leftover placeholder text:**
+
+```bash
+markitdown output.pptx | grep -iE "\bx{3,}\b|lorem|ipsum|\bTODO|\[insert|this.*(page|slide).*layout"
+```
+
+If grep returns results, fix them before declaring success.
+
+### File QA (required)
+
+```bash
+python scripts/validate.py output.pptx                      # built from scratch
+python scripts/validate.py output.pptx --original src.pptx  # built from a template
+```
+
+**If the deck came from a template, always pass `--original`.** A template may itself
+contain parts the XSD rejects, so a bare run can report failures you never caused — and
+a genuine regression can hide among them. `--original` baselines
+the schema and slide checks against the template, suppressing errors it already had.
+The structural checks — relationships, content types, charts — ignore `--original` and
+report template-inherited problems either way, so read those on their own merits.
+
+pptxgenjs emits chart XML PowerPoint refuses to open, and every other tool
+accepts: python-pptx opens those decks, LibreOffice renders them, the XSD
+passes them. Every failure names its fix. Fix it in the generator and rebuild.
+
+### Visual QA
+
+Convert the slides to images (see [Converting to Images](#converting-to-images)) and inspect every one. After staring at the generating code you tend to see what you expect rather than what rendered, so look at the images fresh (a subagent works well for this if you have one). User-visible defects to look for:
+
+- **Text overflow or text cut off at a box or slide boundary — check this first.** It is the most common defect and always user-visible. (For a font the previewer renders unreliably per Typography, the preview is approximate: trust the ~10% slack you left, not its apparent fit.)
+- Overlapping elements (text through shapes, lines through words, stacked elements)
+- Source citations or footers colliding with content above
+- Elements too close (< 0.3" gaps) or cards/sections nearly touching
+- Uneven gaps (large empty area in one place, cramped in another)
+- Insufficient margin from slide edges (< 0.5")
+- Columns or similar elements not aligned consistently
+- Low-contrast text (e.g., light gray text on cream-colored background)
+- Template decoration mispositioned after text replacement — e.g., a title underline positioned for one line, but the replaced title wrapped to two
+- Low-contrast icons (e.g., dark icons on dark backgrounds without a contrasting circle)
+- Text boxes too narrow causing excessive wrapping
+- Leftover placeholder content
+
+## Converting to Images
+
+Convert presentations to individual slide images for visual inspection:
+
+```bash
+python scripts/soffice.py --headless --convert-to pdf output.pptx
+rm -f slide-*.jpg
+pdftoppm -jpeg -r 150 output.pdf slide
+ls -1 "$PWD"/slide-*.jpg
+```
+
+**Pass the absolute paths printed above directly to the view tool.** The `rm` clears stale images from prior runs. `pdftoppm` zero-pads based on page count: `slide-1.jpg` for decks under 10 pages, `slide-01.jpg` for 10-99, `slide-001.jpg` for 100+.
+
+**After fixes, rerun all four commands above** — the PDF must be regenerated from the edited `.pptx` before `pdftoppm` can reflect your changes.
+
+## Dependencies
+
+`pptxgenjs` (npm, preinstalled — install only if `require('pptxgenjs')` fails) · `markitdown[pptx]`, `Pillow`, `defusedxml`, `lxml` (pip — text dump, thumbnail, clean, validate) · LibreOffice (`soffice`, auto-configured for sandboxed environments via `scripts/soffice.py`) · `pdftoppm` (Poppler)
+</script>
+
+<script>
+(function(){
+  "use strict";
+
+  var md = document.getElementById("raw").textContent.replace(/^\r?\n/, "").replace(/\s+$/, "") + "\n";
+
+  /* ---------- helpers ---------- */
+  function esc(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function slug(s){
+    return s.toLowerCase()
+      .replace(/[`*_~]/g,"")
+      .replace(/[^\w\u4e00-\u9fa5\s-]/g,"")
+      .trim().replace(/\s+/g,"-");
+  }
+  // escape first, then apply inline markdown on the escaped text
+  function inline(t){
+    var store = [];
+    var s = t.replace(/`([^`]+)`/g, function(m,p1){
+      store.push(p1); return "\u0000" + (store.length-1) + "\u0000";
+    });
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[\s(（])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+    s = s.replace(/\u0000(\d+)\u0000/g, function(m,i){ return "<code>"+store[i]+"</code>"; });
+    return s;
+  }
+  function inl(raw){ return inline(esc(raw)); }
+  function splitRow(l){
+    var t = l.trim().replace(/^\|/, "").replace(/\|$/, "");
+    return t.split("|").map(function(c){ return c.trim(); });
+  }
+
+  /* ---------- 1. source view with line numbers + highlighting ---------- */
+  var lines = md.split("\n");
+  if(lines.length && lines[lines.length-1] === "") lines.pop();
+
+  var srcHtml = [];
+  var inFront = false, inFence = false;
+
+  for(var i=0;i<lines.length;i++){
+    var raw = lines[i];
+    var cls = "row";
+    var body;
+
+    if(i === 0 && raw.trim() === "---"){ inFront = true; }
+
+    if(inFront){
+      body = '<span class="s-yaml">' + esc(raw) + '</span>';
+      if(i > 0 && raw.trim() === "---") inFront = false;
+    } else if(/^\s*```/.test(raw)){
+      inFence = !inFence;
+      body = '<span class="s-fence">' + esc(raw) + '</span>';
+      cls += " is-fence";
+    } else if(inFence){
+      body = '<span class="s-str">' + esc(raw) + '</span>';
+    } else if(/^#{1,6}\s/.test(raw)){
+      var m = raw.match(/^(#+)(\s+)([\s\S]*)$/);
+      body = '<span class="s-hash">' + m[1] + '</span>' + m[2] +
+             '<span class="s-h">' + inline(esc(m[3])) + '</span>';
+      cls += " is-head";
+    } else if(/^\s*\|/.test(raw)){
+      body = esc(raw).replace(/\|/g, '<span class="s-pipe">|</span>');
+      body = body.replace(/(`[^`]+`)/g, '<span class="s-code">$1</span>')
+                 .replace(/(\*\*[^*]+\*\*)/g, '<span class="s-bold">$1</span>');
+    } else if(/^\s*>\s?/.test(raw)){
+      var q = raw.match(/^(\s*>)(\s?)([\s\S]*)$/);
+      body = '<span class="s-quote">' + q[1] + '</span>' + q[2] + inline(esc(q[3]));
+    } else if(/^\s*[-*+]\s+/.test(raw)){
+      var li = raw.match(/^(\s*)([-*+])(\s+)([\s\S]*)$/);
+      body = li[1] + '<span class="s-dash">' + li[2] + '</span>' + li[3] + inline(esc(li[4]));
+    } else if(raw.trim() === ""){
+      body = "";
+    } else {
+      body = inline(esc(raw));
+    }
+
+    srcHtml.push('<div class="' + cls + '"><span class="no">' + (i+1) + '</span><span class="src">' + (body || "&nbsp;") + '</span></div>');
+  }
+  document.getElementById("code").innerHTML = srcHtml.join("");
+
+  /* ---------- 2. markdown -> html ---------- */
+  var out = [];
+  var i2 = 0;
+  var toc = [];
+  var frontData = null;
+
+  // frontmatter
+  if(lines[0] && lines[0].trim() === "---"){
+    var end = 1;
+    while(end < lines.length && lines[end].trim() !== "---") end++;
+    frontData = parseFront(lines.slice(1, end));
+    i2 = end + 1;
+  }
+
+  function parseFront(arr){
+    var o = [], cur = null, block = false;
+    arr.forEach(function(l){
+      if(/^\s+\S/.test(l) || (block && /^\s*$/.test(l))){
+        if(cur){ cur.parts.push(l.trim()); cur.val += (cur.val ? " " : "") + l.trim(); }
+        return;
+      }
+      var mt = l.match(/^([\w-]+):\s*(.*)$/);
+      if(!mt) return;
+      block = /^[>|]/.test(mt[2]);
+      var v = mt[2].replace(/^[>|][-+]?\s*/, "").replace(/^["']|["']$/g, "");
+      cur = { k: mt[1], val: v, parts: (v ? [v] : []) };
+      o.push(cur);
+    });
+    return o;
+  }
+
+  function renderFront(fm){
+    var map = {};
+    fm.forEach(function(x){ map[x.k] = x.val; });
+    var chips = "";
+    if(map.name) chips += '<span class="chip k">' + esc(map.name) + '</span>';
+    if(map.version) chips += '<span class="chip mono">v' + esc(map.version) + '</span>';
+    if(map.author) chips += '<span class="chip">by ' + esc(map.author) + '</span>';
+    if(map.category) chips += '<span class="chip">' + esc(map.category) + '</span>';
+    if(map.runtime) chips += '<span class="chip mono">' + esc(map.runtime) + '</span>';
+
+    var skip = {name:1, version:1, author:1, category:1, runtime:1};
+    var rows = "";
+    fm.forEach(function(x){
+      if(skip[x.k]) return;
+      var v;
+      if(/^\[.*\]$/.test(x.val)){
+        var items = x.val.replace(/^\[|\]$/g,"").split(",").map(function(t){ return t.trim().replace(/^["']|["']$/g,""); }).filter(Boolean);
+        v = items.map(function(t){ return '<span class="y">' + esc(t) + '</span>'; }).join("");
+      } else if(x.parts && x.parts.length > 1){
+        v = x.parts.map(function(t){ return esc(t); }).join("<br>");
+      } else {
+        v = esc(x.val);
+      }
+      rows += '<div class="fm-k">' + esc(x.k) + '</div><div class="fm-v">' + v + '</div>';
+    });
+
+    return '<div class="doc-meta">' + chips + '</div>' +
+      '<div class="fm"><div class="fm-h"><b>YAML frontmatter</b><span>' + fm.length + ' fields</span></div>' +
+      '<div class="fm-rows">' + rows + '</div></div>';
+  }
+
+  var titleDone = false, metaPending = "";
+
+  while(i2 < lines.length){
+    var line = lines[i2];
+
+    if(/^\s*$/.test(line)){ i2++; continue; }
+
+    // hr
+    if(/^\s*(---|\*\*\*|___)\s*$/.test(line)){
+      out.push("<hr>");
+      i2++; continue;
+    }
+
+    // fenced code
+    if(/^\s*```/.test(line)){
+      var lang = line.replace(/^\s*```/,"").trim();
+      var buf = [];
+      i2++;
+      while(i2 < lines.length && !/^\s*```/.test(lines[i2])){ buf.push(lines[i2]); i2++; }
+      i2++;
+      out.push('<pre><code>' + esc(buf.join("\n")) + '</code></pre>');
+      continue;
+    }
+
+    // heading
+    var hm = line.match(/^(#{1,6})\s+(.*)$/);
+    if(hm){
+      var lvl = hm[1].length;
+      var txt = hm[2].replace(/\s*#+\s*$/,"");
+      var id = slug(txt) || ("sec-" + i2);
+      if(lvl === 1 && !titleDone){
+        titleDone = true;
+        out.push('<h1 id="' + id + '">' + inl(txt) + '</h1>');
+        metaPending = frontData ? renderFront(frontData) : "";
+      } else if(lvl <= 3){
+        if(metaPending){ out.push(metaPending); metaPending = ""; }
+        out.push("<h" + lvl + ' id="' + id + '">' + inl(txt) + "</h" + lvl + ">");
+      } else {
+        out.push("<h" + lvl + ">" + inl(txt) + "</h" + lvl + ">");
+      }
+      i2++; continue;
+    }
+
+    if(metaPending){ out.push(metaPending); metaPending = ""; }
+
+    // blockquote (consecutive >)
+    if(/^\s*>\s?/.test(line)){
+      var qs = [];
+      while(i2 < lines.length && /^\s*>\s?/.test(lines[i2])){
+        qs.push(lines[i2].replace(/^\s*>\s?/,""));
+        i2++;
+      }
+      out.push("<blockquote>" + qs.map(function(q){ return "<p>" + inl(q) + "</p>"; }).join("") + "</blockquote>");
+      continue;
+    }
+
+    // table
+    if(/^\s*\|/.test(line) && i2 + 1 < lines.length && /^\s*\|[\s:|-]+\|?\s*$/.test(lines[i2+1])){
+      var head = splitRow(line);
+      var aligns = splitRow(lines[i2+1]).map(function(c){
+        if(/^:-+:$/.test(c.trim())) return "center";
+        if(/-+:$/.test(c.trim())) return "right";
+        return "left";
+      });
+      i2 += 2;
+      var rows = [];
+      while(i2 < lines.length && /^\s*\|/.test(lines[i2])){
+        rows.push(splitRow(lines[i2])); i2++;
+      }
+      var th = head.map(function(c, n){
+        return '<th style="text-align:' + (aligns[n]||"left") + '">' + inl(c) + "</th>";
+      }).join("");
+      var tb = rows.map(function(r){
+        return "<tr>" + r.map(function(c, n){
+          return '<td style="text-align:' + (aligns[n]||"left") + '">' + inl(c) + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      out.push('<div class="table-wrap"><table><thead><tr>' + th + '</tr></thead><tbody>' + tb + '</tbody></table></div>');
+      continue;
+    }
+
+    // ordered list
+    if(/^\s*\d+[.)]\s+/.test(line)){
+      var oi = [];
+      while(i2 < lines.length && /^\s*\d+[.)]\s+/.test(lines[i2])){
+        oi.push(lines[i2].replace(/^\s*\d+[.)]\s+/,"")); i2++;
+      }
+      out.push("<ol>" + oi.map(function(t){ return "<li>" + inl(t) + "</li>"; }).join("") + "</ol>");
+      continue;
+    }
+
+    // unordered list
+    if(/^\s*[-*+]\s+/.test(line)){
+      var ui = [];
+      while(i2 < lines.length && /^\s*[-*+]\s+/.test(lines[i2])){
+        ui.push(lines[i2].replace(/^\s*[-*+]\s+/,"")); i2++;
+      }
+      out.push("<ul>" + ui.map(function(t){ return "<li>" + inl(t) + "</li>"; }).join("") + "</ul>");
+      continue;
+    }
+
+    // paragraph: join consecutive plain lines
+    var ps = [line];
+    i2++;
+    while(i2 < lines.length){
+      var n = lines[i2];
+      if(/^\s*$/.test(n) || /^#{1,6}\s/.test(n) || /^\s*```/.test(n) ||
+         /^\s*\||^\s*>|^\s*[-*+]\s+/.test(n) || /^\s*\d+[.)]\s+/.test(n) || /^\s*---\s*$/.test(n)) break;
+      ps.push(n); i2++;
+    }
+    out.push("<p>" + inl(ps.join(" ")) + "</p>");
+  }
+  if(metaPending) out.push(metaPending);
+
+  document.getElementById("mdOut").innerHTML = out.join("\n");
+
+  /* ---------- 3. stats ---------- */
+  var bytes = new Blob([md]).size;
+  document.getElementById("mLines").textContent = lines.length;
+  document.getElementById("mBytes").textContent = (bytes/1024).toFixed(1) + " KB";
+  document.getElementById("mVer").textContent = "pptx";
+
+  /* ---------- 4. drag to resize ---------- */
+  var split = document.getElementById("split");
+  var divider = document.getElementById("divider");
+  var paneSrc = document.querySelector(".pane-src");
+  var dragging = false;
+
+  divider.addEventListener("mousedown", function(e){
+    dragging = true;
+    divider.classList.add("dragging");
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  });
+  window.addEventListener("mousemove", function(e){
+    if(!dragging) return;
+    var pct = Math.min(76, Math.max(22, (e.clientX / window.innerWidth) * 100));
+    paneSrc.style.flex = "0 0 " + pct + "%";
+  });
+  window.addEventListener("mouseup", function(){
+    if(!dragging) return;
+    dragging = false;
+    divider.classList.remove("dragging");
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  });
+
+  /* ---------- 5. synced scrolling ---------- */
+  var srcScroll = document.getElementById("srcScroll");
+  var prevScroll = document.getElementById("prevScroll");
+  var syncOn = true;
+  var lock = false;
+
+  function ratio(el){ return el.scrollTop / Math.max(1, el.scrollHeight - el.clientHeight); }
+
+  srcScroll.addEventListener("scroll", function(){
+    if(!syncOn || lock) return;
+    lock = true;
+    prevScroll.scrollTop = ratio(srcScroll) * (prevScroll.scrollHeight - prevScroll.clientHeight);
+    requestAnimationFrame(function(){ lock = false; });
+  });
+  prevScroll.addEventListener("scroll", function(){
+    if(!syncOn || lock) return;
+    lock = true;
+    srcScroll.scrollTop = ratio(prevScroll) * (srcScroll.scrollHeight - srcScroll.clientHeight);
+    requestAnimationFrame(function(){ lock = false; });
+  });
+
+  var btnSync = document.getElementById("btnSync");
+  btnSync.addEventListener("click", function(){
+    syncOn = !syncOn;
+    btnSync.classList.toggle("on", syncOn);
+  });
+
+  /* ---------- 6. copy ---------- */
+  var toast = document.getElementById("toast");
+  var tId;
+  function flash(txt){
+    toast.textContent = txt;
+    toast.classList.add("show");
+    clearTimeout(tId);
+    tId = setTimeout(function(){ toast.classList.remove("show"); }, 1500);
+  }
+  document.getElementById("btnCopy").addEventListener("click", function(){
+    var done = function(){ flash("SKILL.md 全文已复制"); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(md).then(done, function(){ fallback(); });
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement("textarea");
+      ta.value = md;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); done(); }catch(e){ flash("复制失败，请手动选择"); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ---------- 7. smooth anchor jumps inside preview ---------- */
+  document.getElementById("mdOut").addEventListener("click", function(e){
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if(!a) return;
+    e.preventDefault();
+    var el = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)));
+    if(el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+})();
+</script>
+</body>
+</html>
