@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课程作业 · AI 工具实践测评</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+        --bg: #1a1a2e;
+        --bg-2: #16213e;
+        --panel: rgba(255,255,255,0.05);
+        --line: rgba(255,255,255,0.12);
+        --accent: #e94560;
+        --accent-soft: rgba(233,69,96,0.14);
+        --ink: #f2f5f3;
+        --muted: rgba(242,245,243,0.65);
+        --gold: #ffd700;
+    }
+    body {
+        font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+        background: linear-gradient(135deg, var(--bg) 0%, var(--bg-2) 100%);
+        color: var(--ink);
+        line-height: 1.75;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+    }
+    .deco { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .deco .ring {
+        position: absolute; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%;
+    }
+    .deco .r1 { width: 700px; height: 700px; top: -200px; left: -200px; }
+    .deco .r2 { width: 500px; height: 500px; bottom: -150px; right: -150px; }
+    .deco .glow {
+        position: absolute; width: 800px; height: 800px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(233,69,96,0.08), transparent 65%);
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+
+    .wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 56px 40px 90px; }
+
+    .back {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 9px 20px; border-radius: 999px; text-decoration: none;
+        border: 1px solid var(--line); background: var(--panel);
+        color: var(--muted); font-size: 13.5px; transition: .25s;
+    }
+    .back:hover { color: var(--ink); border-color: var(--accent); background: var(--accent-soft); }
+
+    header { padding: 56px 0 64px; border-bottom: 1px solid var(--line); margin-bottom: 60px; }
+    .kicker {
+        font-size: 12px; letter-spacing: 5px; color: var(--accent);
+        font-weight: 700; margin-bottom: 22px;
+    }
+    h1 {
+        font-size: 56px; font-weight: 900; letter-spacing: 2px; line-height: 1.15;
+        margin-bottom: 22px;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lede { font-size: 19px; color: var(--muted); max-width: 760px; margin-bottom: 26px; }
+    .facts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .facts span {
+        font-size: 12.5px; padding: 6px 15px; border-radius: 6px;
+        background: var(--panel); border: 1px solid var(--line); color: var(--muted);
+        letter-spacing: .5px;
+    }
+    .facts .score { color: var(--gold); border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.08); font-weight: 700; }
+
+    section { margin-bottom: 76px; }
+    .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 28px; }
+    .sec-num {
+        font-size: 13px; font-weight: 800; letter-spacing: 2px; color: var(--accent);
+        font-family: ui-monospace, Consolas, monospace;
+    }
+    .sec-head h2 { font-size: 27px; font-weight: 800; letter-spacing: 1px; }
+    .sec-head .en {
+        font-size: 12px; letter-spacing: 3px; color: rgba(242,245,243,0.32);
+        text-transform: uppercase; margin-left: auto; font-weight: 600;
+    }
+
+    /* 作品卡片 */
+    .quiz-card {
+        background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+        overflow: hidden; margin-bottom: 32px; transition: .3s;
+    }
+    .quiz-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+    .quiz-head {
+        display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        padding: 24px 28px; border-bottom: 1px solid var(--line);
+        background: linear-gradient(90deg, rgba(233,69,96,0.08), transparent);
+    }
+    .quiz-head .q-icon { font-size: 36px; }
+    .quiz-head .q-info { flex: 1; min-width: 200px; }
+    .quiz-head h3 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+    .quiz-head .q-meta { font-size: 13px; color: var(--muted); letter-spacing: 1px; }
+    .quiz-head .q-score {
+        font-size: 28px; font-weight: 900; color: var(--gold);
+        font-family: ui-monospace, Consolas, monospace;
+    }
+    .quiz-head .q-score small { font-size: 14px; color: var(--muted); font-weight: 400; }
+
+    .quiz-body { padding: 28px; }
+    .quiz-body img {
+        width: 100%; border-radius: 10px; border: 1px solid var(--line);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3); cursor: zoom-in; transition: .3s;
+    }
+    .quiz-body img:hover { box-shadow: 0 14px 40px rgba(233,69,96,0.25); }
+
+    .quiz-desc {
+        margin-top: 20px; padding: 20px 24px; border-radius: 10px;
+        background: rgba(255,255,255,0.03); border-left: 3px solid var(--accent);
+    }
+    .quiz-desc p { font-size: 14.5px; color: var(--muted); line-height: 1.9; }
+    .quiz-desc strong { color: #ffb3bf; }
+
+    /* 知识点 */
+    .knowledge { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .k-item {
+        padding: 22px; border-radius: 12px;
+        background: var(--panel); border: 1px solid var(--line);
+    }
+    .k-item h4 { font-size: 15px; margin-bottom: 8px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .k-item p { font-size: 13.5px; color: var(--muted); line-height: 1.8; }
+
+    .note {
+        padding: 34px 38px; border-radius: 12px;
+        background: linear-gradient(135deg, rgba(233,69,96,.10), rgba(255,255,255,.03));
+        border: 1px solid rgba(233,69,96,.28);
+    }
+    .note h3 { font-size: 19px; margin-bottom: 16px; letter-spacing: .5px; color: #ffb3bf; }
+    .note p { font-size: 14.5px; color: rgba(242,245,243,.82); line-height: 2; margin-bottom: 12px; }
+    .note p:last-child { margin-bottom: 0; }
+    .note strong { color: #ffc0cb; }
+
+    footer { text-align: center; font-size: 12.5px; color: rgba(242,245,243,.35); letter-spacing: 1.5px; line-height: 2; border-top: 1px solid var(--line); padding-top: 40px; }
+
+    /* 灯箱 */
+    .lightbox {
+        position: fixed; inset: 0; background: rgba(10,10,20,.95); z-index: 100;
+        display: none; align-items: center; justify-content: center; padding: 40px; cursor: zoom-out;
+    }
+    .lightbox.on { display: flex; }
+    .lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; box-shadow: 0 30px 80px rgba(0,0,0,.7); }
+
+    @media (max-width: 760px) {
+        .wrap { padding: 30px 20px 60px; }
+        h1 { font-size: 34px; }
+        .lede { font-size: 16px; }
+        header { padding: 30px 0 40px; margin-bottom: 40px; }
+        .sec-head { flex-wrap: wrap; gap: 8px; }
+        .sec-head .en { display: none; }
+        .quiz-head { padding: 20px; }
+        .quiz-body { padding: 20px; }
+        .quiz-body img { cursor: default; }
+        .note { padding: 26px 22px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="deco">
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="glow"></div>
+</div>
+
+<div class="wrap">
+
+    <a href="./index.html" class="back">← 返回作品集</a>
+
+    <header>
+        <div class="kicker">COURSE ASSESSMENT · 作品 10</div>
+        <h1>课程作业<em>测评</em><br>AI 工具实践与理论</h1>
+        <p class="lede">从学习通上的中国风符号审校测试，到人工智能课程的工具对比作业 —— 两份满分答卷，记录我在 AI 工具理解与应用上的成长。</p>
+        <div class="facts">
+            <span class="score">🏆 满分 × 2</span>
+            <span>中国风符号审校</span>
+            <span>AI 工具对比作业</span>
+            <span>学习通 · AIC2026</span>
+        </div>
+    </header>
+
+    <!-- 作业一：中国风图片符号审校 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">01</span>
+            <h2>中国风图片符号审校</h2>
+            <span class="en">Cultural Symbol Review</span>
+        </div>
+
+        <div class="quiz-card">
+            <div class="quiz-head">
+                <div class="q-icon">🏮</div>
+                <div class="q-info">
+                    <h3>学习通在线测试</h3>
+                    <div class="q-meta">超星学习通 · 中国风图片符号审校 · 10 道选择题</div>
+                </div>
+                <div class="q-score">100<small> / 100</small></div>
+            </div>
+            <div class="quiz-body">
+                <img src="./images/09-course-quiz.png" alt="中国风图片符号审校测试结果" onclick="openLightbox(this.src)">
+                <div class="quiz-desc">
+                    <p>这是一份关于<strong>中国传统符号与 AI 图像生成</strong>关系的在线测试。题目涵盖：</p>
+                    <p>• 传统艺术符号的文化内涵（如<strong>戏曲脸谱</strong>的象征意义）<br>
+                    • AI 生成图像时<strong>正确使用文化符号</strong>的原则<br>
+                    • 如何避免<strong>文化刻板印象</strong>与元素堆砌<br>
+                    • <strong>水墨色调</strong>、传统纹样在现代设计中的应用</p>
+                    <p>最终答案为 <strong>abbbbbcbbcb</strong>，全部正确。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 作业二：AI 工具对比 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">02</span>
+            <h2>人工智能作业 1 · 工具对比</h2>
+            <span class="en">AI Tool Comparison</span>
+        </div>
+
+        <div class="quiz-card">
+            <div class="quiz-head">
+                <div class="q-icon">⚡</div>
+                <div class="q-info">
+                    <h3>AIC2026 · 作业 1 工具对比</h3>
+                    <div class="q-meta">人工智能课程 · 李欣彤 · 202601818</div>
+                </div>
+                <div class="q-score">100<small> / 100</small></div>
+            </div>
+            <div class="quiz-body">
+                <img src="./images/09-homework-score.png" alt="AI 工具对比作业成绩单" onclick="openLightbox(this.src)">
+                <div class="quiz-desc">
+                    <p>这次作业要求用<strong>两种不同的 AI 工具</strong>完成同一项任务，对比成品差异：</p>
+                    <p>• <strong>成品 A</strong>：体育教育专业培养目标描述（含四项专业能力要求）<br>
+                    • <strong>成品 B</strong>：把这段话压缩成 100 字摘要，使用 workbuddy 生成 MD 文件</p>
+                    <p>评分维度为<strong>二八开</strong>：80 分给自己互评，20 分系统自动批阅。最终获得满分。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心知识点 -->
+    <section>
+        <div class="sec-head">
+            <span class="sec-num">03</span>
+            <h2>核心知识点</h2>
+            <span class="en">Key Takeaways</span>
+        </div>
+        <div class="knowledge">
+            <div class="k-item">
+                <h4>🎭 文化符号的正确使用</h4>
+                <p>AI 生成图像时不能随机堆砌传统元素，要理解每个符号的文化内涵和语境。</p>
+            </div>
+            <div class="k-item">
+                <h4>🛠️ 工具选型决定产出</h4>
+                <p>不同 AI 工具有不同专长：长文本生成、摘要压缩、格式转换各有最佳工具。</p>
+            </div>
+            <div class="k-item">
+                <h4>📐 提示词精准性</h4>
+                <p>明确的任务描述 + 具体的输出格式要求，是让 AI 产出符合预期的关键。</p>
+            </div>
+            <div class="k-item">
+                <h4>🔍 批判性审视</h4>
+                <p>不只是接受 AI 输出，还要能对比、评估、优化，形成自己的判断标准。</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="note">
+        <h3>这一次学到了什么</h3>
+        <p>前几次的作品都是"做出一个东西"——概念图、游戏、旋律、海报。这次不一样，是<strong>考试和作业</strong>，检验的是我对 AI 工具和相关概念的<strong>理解深度</strong>。</p>
+        <p>中国风符号那套题让我意识到，<strong>AI 图像生成远不止"好看"那么简单</strong>。把戏曲脸谱、水墨山水随便贴上去不叫"中国风"，理解背后的文化逻辑和使用场景才是。这也让我重新审视了之前自己做的那些 AI 生成作品——有没有在无意中点犯了文化刻板印象？</p>
+        <p>工具对比作业则让我体会到<strong>"没有最好的工具，只有最合适的工具"</strong>。让不同 AI 做同一件事，差异比想象中大得多。学会根据任务选工具，比只会用一个工具更重要。</p>
+    </div>
+
+    <footer>
+        人工智能课程学习成果 · 作品 10<br>
+        课程作业测评 · 2026-11
+    </footer>
+
+</div>
+
+<div class="lightbox" id="lightbox"><img src="" alt="放大预览"></div>
+
+<script>
+function openLightbox(src) {
+    var lb = document.getElementById('lightbox');
+    lb.querySelector('img').src = src;
+    lb.classList.add('on');
+}
+document.getElementById('lightbox').addEventListener('click', function () {
+    this.classList.remove('on');
+});
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('on');
+});
+</script>
+
+</body>
+</html>
